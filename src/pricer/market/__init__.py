@@ -11,6 +11,7 @@ from pricer.market.curves import (
     DiscountCurve,
     FlatForwardCurve,
     YieldCurve,
+    ZeroSpreadedCurve,
     discount_from_rate,
     rate_from_discount,
 )
@@ -27,6 +28,7 @@ __all__ = [
     "ParYieldQuote",
     "VolatilitySurface",
     "YieldCurve",
+    "ZeroSpreadedCurve",
     "bootstrap_par_yield_curve",
     "discount_from_rate",
     "par_yield",

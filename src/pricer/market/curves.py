@@ -192,6 +192,35 @@ class FlatForwardCurve(YieldCurve):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class ZeroSpreadedCurve(YieldCurve):
+    """Base curve shifted by a constant continuously-compounded zero spread.
+
+    ``P'(t) = P(t) * exp(-s t)``: every zero rate moves by ``s``, so does every forward rate.
+    This is the parallel shift used for curve DV01, and the curve behind a bond z-spread.
+    It wraps the base curve instead of copying it, so the shift is exact even between
+    pillars, whatever the base interpolation.
+
+    Attributes:
+        base: Curve to shift.
+        spread: Continuously-compounded spread, as a decimal (``1e-4`` for 1bp).
+    """
+
+    base: YieldCurve
+    spread: float
+
+    @property
+    def reference_date(self) -> date:  # noqa: D102
+        return self.base.reference_date
+
+    @property
+    def day_count(self) -> DayCount:  # noqa: D102
+        return self.base.day_count
+
+    def discount_factors(self, times: FloatArray) -> FloatArray:  # noqa: D102
+        return self.base.discount_factors(times) * np.exp(-self.spread * times)
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class DiscountCurve(YieldCurve):
     """Discount curve interpolated log-linearly between pillar discount factors.
 

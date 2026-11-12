@@ -6,7 +6,8 @@ A production-grade Python pricing and risk library, with a distributed, real-tim
 service built on top of it.
 
 > **Status: phase 1 (foundations).** Dates and day counts, immutable market snapshot,
-> yield-curve bootstrap from public par yields, validated against QuantLib.
+> yield-curve bootstrap from public par yields, fixed-rate bonds (pricing, yield, durations,
+> convexity, z-spread, curve DV01), all validated against QuantLib.
 
 ## Design principles
 
@@ -46,6 +47,21 @@ snapshot = MarketSnapshot(
 print(snapshot.curve("USD-TSY").zero_rate(date(as_of.year + 10, as_of.month, 1)))
 ```
 
+```python
+from pricer.analytics import yield_analytics, yield_to_maturity
+from pricer.engines import DiscountingBondEngine
+from pricer.instruments import FixedRateBond
+from pricer.risk import parallel_dv01
+
+bond = FixedRateBond(issue_date=date(2023, 8, 15), maturity=date(2033, 8, 15), coupon_rate=0.03875)
+engine = DiscountingBondEngine(curve_name="USD-TSY")
+
+valuation = engine.price(bond, snapshot)               # clean, dirty, accrued
+ytm = yield_to_maturity(bond, valuation.clean_price, as_of)
+risk = yield_analytics(bond, ytm, as_of)                # durations, convexity, DV01
+curve_dv01 = parallel_dv01(lambda m: engine.price(bond, m).npv, snapshot, "USD-TSY")
+```
+
 ## Layout
 
 ```
@@ -53,6 +69,10 @@ src/pricer/
   dates/        tenors, schedules, day-count conventions
   market/       yield curves, bootstrap, volatility, MarketSnapshot
     sources/    public market-data loaders (US Treasury)
+  instruments/  contract terms and cash flows (FixedRateBond)
+  engines/      pricing engines, injected per instrument (DiscountingBondEngine)
+  analytics/    yield-based measures: YTM, durations, convexity, z-spread
+  risk/         bump-and-revalue risk (parallel curve DV01)
 tests/          unit tests (pytest, hypothesis)
 validation/     model validation against QuantLib
 docs/adr/       architecture decision records

@@ -12,6 +12,7 @@ from pricer.market import (
     Compounding,
     DiscountCurve,
     FlatForwardCurve,
+    ZeroSpreadedCurve,
     discount_from_rate,
     rate_from_discount,
 )
@@ -173,3 +174,21 @@ class TestDiscountCurve:
     def test_validation(self, dates: list[date], discounts: list[float], match: str) -> None:
         with pytest.raises(MarketDataError, match=match):
             DiscountCurve(REF, dates, discounts)
+
+
+class TestZeroSpreadedCurve:
+    base = DiscountCurve(REF, [date(2026, 8, 29), date(2030, 8, 29)], [0.96, 0.82])
+
+    def test_shifts_every_zero_rate(self) -> None:
+        shifted = ZeroSpreadedCurve(self.base, 0.01)
+        for d in (date(2026, 1, 1), date(2028, 6, 30), date(2040, 1, 1)):
+            assert shifted.zero_rate(d) == pytest.approx(self.base.zero_rate(d) + 0.01)
+        assert shifted.forward_rate(date(2027, 1, 1), date(2029, 1, 1)) == pytest.approx(
+            self.base.forward_rate(date(2027, 1, 1), date(2029, 1, 1)) + 0.01
+        )
+
+    def test_inherits_anchor_and_axis(self) -> None:
+        shifted = ZeroSpreadedCurve(self.base, -0.002)
+        assert shifted.reference_date == REF
+        assert shifted.day_count is self.base.day_count
+        assert shifted.discount(REF) == 1.0
