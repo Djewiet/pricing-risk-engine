@@ -56,9 +56,9 @@ from pricer.risk import parallel_dv01
 bond = FixedRateBond(issue_date=date(2023, 8, 15), maturity=date(2033, 8, 15), coupon_rate=0.03875)
 engine = DiscountingBondEngine(curve_name="USD-TSY")
 
-valuation = engine.price(bond, snapshot)               # clean, dirty, accrued
+valuation = engine.price(bond, snapshot)  # clean, dirty, accrued
 ytm = yield_to_maturity(bond, valuation.clean_price, as_of)
-risk = yield_analytics(bond, ytm, as_of)                # durations, convexity, DV01
+risk = yield_analytics(bond, ytm, as_of)  # durations, convexity, DV01
 curve_dv01 = parallel_dv01(lambda m: engine.price(bond, m).npv, snapshot, "USD-TSY")
 ```
 
