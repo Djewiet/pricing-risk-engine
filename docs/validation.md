@@ -24,6 +24,7 @@ flowchart LR
 | Analytics | A single cash flow has a Macaulay duration equal to its time; zero-coupon bond yields. |
 | Risk | Zero-coupon curve DV01 $= t \cdot P \cdot 10^{-4}$, up to $O((ht)^2)$. |
 | Swap | Single-curve floating leg $= N(D(t_0) - D(T))$; par rate closed form; swap at its par rate is worth 0. |
+| Options | Textbook example (Hull); at-the-money-forward $V = D_r F\,\mathrm{erf}\big(\sigma\sqrt{T}/(2\sqrt{2})\big)$; zero volatility gives the discounted forward intrinsic value. |
 
 **2. Properties.** Relations that must hold for any input, several of them generated with
 hypothesis (property-based testing).
@@ -37,6 +38,10 @@ hypothesis (property-based testing).
 - Dirty price drops by one coupon across a coupon date, clean price stays continuous.
 - A cheaper bond has a higher z-spread; payer = −receiver for swaps.
 - Bumping never modifies the base snapshot.
+- Options: put-call parity (and its Greeks: $\Delta_C - \Delta_P = D_q$, equal gammas and
+  vegas), no-arbitrage bounds, decreasing and convex in strike, the Black-Scholes PDE
+  $\Theta + (r-q)S\Delta + \tfrac12\sigma^2S^2\Gamma - rV = 0$; analytic Greeks match central
+  finite differences and bumps of the snapshot (spot, volatility, each curve).
 
 **3. QuantLib benchmark** (`validation/`). QuantLib is set up to reproduce the library's
 conventions *exactly* (`NullCalendar`, `Unadjusted`, zero settlement days, backward
@@ -52,6 +57,7 @@ not a modelling choice.
 | | | Z-spread (2 points below the curve price) | $10^{-9}$ | QuantLib's z-spread solver accuracy |
 | Swap | 6 swaps × (single, two-curve) | NPV, leg PVs | $10^{-8} \times N$ | Well below a cent per million; QuantLib compounds daily, we telescope |
 | | | Par rate | $10^{-12}$ | |
+| European option (Black-Scholes) | 144 flat markets (3 spots × 3 expiries × 2 rates incl. negative × 2 dividend yields × 2 vols × call/put) + 18 on a bootstrapped curve | Price, delta, gamma, vega, theta, rho, dividend rho | $10^{-10}$ relative, $10^{-12}$ absolute | Same closed form on both sides; observed $\le 1.1 \times 10^{-13}$ |
 
 The reference dates are chosen to break date generation: 29 and 31 August, 29 February,
 31 January, mid-month, the last business day of a year.

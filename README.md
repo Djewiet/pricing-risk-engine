@@ -9,16 +9,18 @@
 A production-grade Python pricing and risk library, with a distributed, real-time risk
 service built on top of it.
 
-> **Status: phase 1 (foundations).** Dates and day counts, immutable market snapshot,
-> yield-curve bootstrap from US Treasury par yields, fixed-rate bonds (pricing, yield,
-> durations, convexity, z-spread, curve DV01) and vanilla interest rate swaps on separate
-> forecast and discount curves. Every formula is validated against QuantLib.
+> **Status: phase 2 (options) in progress.** Phase 1 is done: dates and day counts,
+> immutable market snapshot, yield-curve bootstrap from US Treasury par yields, fixed-rate
+> bonds (pricing, yield, durations, convexity, z-spread, curve DV01) and vanilla interest
+> rate swaps on separate forecast and discount curves. Phase 2 so far: European options
+> under Black-Scholes with analytic Greeks. Every formula is validated against QuantLib.
 
 **Documentation:** <https://djewiet.github.io/pricing-risk-engine/>, with a
 [reading guide](docs/reading-guide.md) (which files to read, in which order, and why), the
 [architecture](docs/architecture/index.md), and the finance behind each model
 ([curve](docs/finance/yield-curve.md), [bond](docs/finance/fixed-rate-bond.md),
-[analytics](docs/finance/bond-analytics.md), [swap](docs/finance/interest-rate-swap.md)).
+[analytics](docs/finance/bond-analytics.md), [swap](docs/finance/interest-rate-swap.md),
+[options](docs/finance/black-scholes.md)).
 
 ## Quickstart
 
@@ -126,8 +128,8 @@ flowchart LR
 - **Explicit conventions.** Day counts, schedules, compounding and the curve time axis are
   always explicit; nothing is rolled or adjusted silently.
 - **Independent validation.** Closed forms, arbitrage properties (hypothesis) and a QuantLib
-  benchmark with identical conventions: 60 cases, discount factors to 1e-11, bond prices
-  to 1e-10, swap NPVs to 1e-8 of notional.
+  benchmark with identical conventions: 222 cases, discount factors to 1e-11, bond prices
+  to 1e-10, swap NPVs to 1e-8 of notional, option prices and Greeks to 1e-10 relative.
 
 More diagrams (module layers, class model, pricing sequences) in
 [docs/architecture](docs/architecture/index.md).
@@ -139,8 +141,10 @@ src/pricer/
   dates/        tenors, schedules, day-count conventions
   market/       yield curves, bootstrap, volatility, MarketSnapshot
     sources/    public market-data loaders (US Treasury)
-  instruments/  contract terms and cash flows (FixedRateBond, InterestRateSwap)
+  instruments/  contract terms and cash flows (FixedRateBond, InterestRateSwap, EuropeanOption)
+  models/       model dynamics bound to the snapshot (BlackScholesModel)
   engines/      pricing engines, injected per instrument
+  greeks/       option sensitivities (Greeks)
   analytics/    yield-based measures: YTM, durations, convexity, z-spread
   risk/         bump-and-revalue risk (parallel curve DV01)
 tests/          unit tests mirroring src/ (pytest, hypothesis)
@@ -152,7 +156,8 @@ docs/           MkDocs site: reading guide, architecture, finance notes, ADRs
 ## Roadmap
 
 1. **Foundations**: curve, bonds, swaps (done); calendars, key-rate DV01.
-2. **Options**: Black-Scholes, CRR tree, Monte Carlo, Greeks, validation report.
+2. **Options**: Black-Scholes and analytic Greeks (done); bump Greeks, implied vol, CRR
+   tree, Monte Carlo, validation report.
 3. **Heston and performance**: NumPy → Numba → multi-process, benchmarked.
 4. **Risk service**: Redis Streams, worker pool, FastAPI + WebSocket, VaR, PostgreSQL.
 5. **Polish**: Prometheus/Grafana, published validation report.

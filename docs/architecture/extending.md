@@ -34,6 +34,14 @@ A new method for an existing instrument (a spread engine, a tree, a Monte Carlo)
 engine class. The instrument and the existing engines do not change. If you are tempted to
 write `if isinstance(instrument, ...)` inside an engine, you need a second engine.
 
+## Adding a model
+
+A model whose parameters are market data is a *binding* to the snapshot
+([ADR 0002](../adr/0002-option-model-binding.md)): a frozen dataclass in `pricer/models/`
+holding the names of the curves it reads, with an `inputs(...)` method returning a frozen
+inputs object. Every engine for that model takes the model in its constructor and calls
+`inputs`, so the closed form, the tree and the Monte Carlo price exactly the same model.
+
 ## Adding a risk measure
 
 Write it against the `MarketSnapshot -> float` signature, like `parallel_dv01`. It then

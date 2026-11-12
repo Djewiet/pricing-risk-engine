@@ -216,3 +216,86 @@ None of the existing classes changed to add the swap: it reuses `Schedule`, `Day
 `FixedCoupon`, `YieldCurve` and `MarketSnapshot`, and `parallel_dv01` applies to it
 unchanged. The engine takes two curve names instead of one: the curve *roles* are part of
 the engine, not of the instrument.
+
+## European option
+
+```mermaid
+classDiagram
+    direction LR
+    class PricingEngine~InstrumentT, ResultT~ {
+        <<Protocol>>
+        +price(instrument, market) ResultT
+    }
+    class EuropeanOption {
+        <<frozen>>
+        +underlying str
+        +strike float
+        +expiry date
+        +option_type OptionType
+        +payoff(spots ndarray) ndarray
+        +is_expired(valuation_date) bool
+    }
+    class OptionType {
+        <<enumeration>>
+        CALL
+        PUT
+        +sign int
+    }
+    class BlackScholesModel {
+        <<frozen>>
+        +discount_curve str
+        +dividend_curve str | None
+        +day_count DayCount
+        +inputs(underlying, expiry, strike, market) BlackScholesInputs
+    }
+    class BlackScholesInputs {
+        <<frozen>>
+        +spot float
+        +time_to_expiry float
+        +discount_factor float
+        +dividend_discount_factor float
+        +volatility float
+        +forward float
+        +rate float
+        +dividend_yield float
+    }
+    class AnalyticEuropeanEngine {
+        <<frozen>>
+        +model BlackScholesModel
+        +price(option, market) BlackScholesValuation
+    }
+    class BlackScholesValuation {
+        <<frozen>>
+        +npv float
+        +forward float
+        +d1 float
+        +d2 float
+        +greeks Greeks
+    }
+    class Greeks {
+        <<frozen>>
+        +delta float
+        +gamma float
+        +vega float
+        +theta float
+        +rho float
+        +dividend_rho float
+        +theta_per_day float
+    }
+    class MarketSnapshot
+
+    PricingEngine <|.. AnalyticEuropeanEngine
+    AnalyticEuropeanEngine o-- BlackScholesModel
+    AnalyticEuropeanEngine ..> EuropeanOption : prices
+    AnalyticEuropeanEngine ..> BlackScholesValuation : returns
+    BlackScholesModel ..> MarketSnapshot : reads spot, curves, vol
+    BlackScholesModel ..> BlackScholesInputs : resolves
+    EuropeanOption --> OptionType
+    BlackScholesValuation *-- Greeks
+```
+
+The option introduces the third leg of the architecture. The **model** knows which curves
+of the snapshot play the risk-free and dividend roles and turns the snapshot into
+`BlackScholesInputs`; the **engine** only applies a formula to those inputs. The tree and
+Monte Carlo engines of phase 2 take the same model, so the three methods price one model
+by construction ([ADR 0002](../adr/0002-option-model-binding.md)).
