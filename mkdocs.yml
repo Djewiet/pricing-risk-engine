@@ -1,0 +1,75 @@
+site_name: Pricing & Risk Engine
+site_description: A Python pricing and risk library, with a distributed real-time risk service.
+repo_url: https://github.com/Djewiet/pricing-risk-engine
+repo_name: Djewiet/pricing-risk-engine
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - content.code.copy
+    - search.highlight
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js
+
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - Reading guide: reading-guide.md
+  - Architecture:
+      - Overview: architecture/index.md
+      - Data flow: architecture/data-flow.md
+      - Class model: architecture/class-model.md
+      - Extending the library: architecture/extending.md
+  - Finance:
+      - Rates and day counts: finance/rates.md
+      - Yield curve bootstrap: finance/yield-curve.md
+      - Fixed-rate bond: finance/fixed-rate-bond.md
+      - Bond analytics and risk: finance/bond-analytics.md
+      - Interest rate swap: finance/interest-rate-swap.md
+  - Validation: validation.md
+  - Development: development.md
+  - Decisions:
+      - ADR 0001 Yield curve: adr/0001-yield-curve-bootstrap.md
+  - Roadmap: roadmap.md
+  - Glossary: glossary.md

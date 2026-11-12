@@ -22,6 +22,9 @@ dev = [
 validation = [
     "QuantLib>=1.36",
 ]
+docs = [
+    "mkdocs-material>=9.5",
+]
 
 [build-system]
 requires = ["hatchling"]
@@ -37,7 +40,7 @@ default-groups = ["dev", "validation"]
 [tool.ruff]
 line-length = 100
 target-version = "py312"
-src = ["src", "tests", "validation"]
+src = ["src", "tests", "validation", "examples"]
 
 [tool.ruff.lint]
 select = [
@@ -66,7 +69,7 @@ ban-relative-imports = "all"
 python_version = "3.12"
 strict = true
 warn_unreachable = true
-files = ["src", "tests", "validation"]
+files = ["src", "tests", "validation", "examples"]
 
 [[tool.mypy.overrides]]
 module = ["QuantLib", "QuantLib.*"]
