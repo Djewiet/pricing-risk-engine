@@ -42,4 +42,30 @@ class Redemption:
     amount: float
 
 
+@dataclass(frozen=True, slots=True)
+class OvernightCoupon:
+    """Coupon paying an overnight rate compounded daily over its accrual period.
+
+    The amount is unknown until the end of the period (the rate is set *in arrears*): it is
+    ``nominal * (compounded_rate + spread) * accrual``, with
+    ``compounded_rate = (prod_d (1 + r_d * delta_d) - 1) / accrual`` over the overnight
+    fixings ``r_d`` of the period. Valuation therefore needs a forecast curve.
+
+    Attributes:
+        payment_date: Date the coupon is paid (equal to ``accrual_end``: no payment lag).
+        nominal: Notional in currency.
+        accrual_start: Start of the accrual period (first fixing date).
+        accrual_end: End of the accrual period.
+        accrual: Accrual year fraction under the floating-leg day count.
+        spread: Spread added to the compounded rate, as a decimal.
+    """
+
+    payment_date: date
+    nominal: float
+    accrual_start: date
+    accrual_end: date
+    accrual: float
+    spread: float
+
+
 type Cashflow = FixedCoupon | Redemption
