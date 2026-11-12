@@ -67,9 +67,11 @@ nav:
       - Fixed-rate bond: finance/fixed-rate-bond.md
       - Bond analytics and risk: finance/bond-analytics.md
       - Interest rate swap: finance/interest-rate-swap.md
+      - European options (Black-Scholes): finance/black-scholes.md
   - Validation: validation.md
   - Development: development.md
   - Decisions:
       - ADR 0001 Yield curve: adr/0001-yield-curve-bootstrap.md
+      - ADR 0002 Option models: adr/0002-option-model-binding.md
   - Roadmap: roadmap.md
   - Glossary: glossary.md

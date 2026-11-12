@@ -57,10 +57,14 @@ flowchart TB
         tsy["market.sources.us_treasury"]
     end
     subgraph L2["Contracts"]
-        instr["instruments<br/>bond, cashflows"]
+        instr["instruments<br/>bond, cashflows, swap, option"]
+        greeks["greeks"]
+    end
+    subgraph LM["Models"]
+        models["models<br/>black_scholes"]
     end
     subgraph L3["Computation"]
-        eng["engines<br/>base, bond"]
+        eng["engines<br/>base, bond, swap, analytic_european"]
     end
     subgraph L4["Measures"]
         risk["risk.curve"]
@@ -73,7 +77,8 @@ flowchart TB
     snap --> curves & vol
     tsy --> boot
     instr --> dates
-    eng --> instr & snap & curves
+    models --> snap & dates
+    eng --> instr & snap & curves & models & greeks
     risk --> snap & curves
     ana --> eng & instr & risk
 ```
@@ -87,8 +92,8 @@ flowchart TB
 | `pricer.engines` | Valuation methods, one class per (instrument, method). | `instruments`, `market` |
 | `pricer.analytics` | Instrument measures that need a price or a yield, not a full market (YTM, duration, z-spread). | `engines`, `instruments`, `market` |
 | `pricer.risk` | Bump-and-revalue sensitivities on a snapshot. | `market` |
-| `pricer.models` *(phase 2)* | Model dynamics and parameters (Black-Scholes, Heston). | `market` |
-| `pricer.greeks` *(phase 2)* | Option sensitivities, analytic or by bump. | `engines`, `market` |
+| `pricer.models` | Model dynamics bound to the snapshot: `BlackScholesModel` resolves spot, discount factors and volatility for one option ([ADR 0002](../adr/0002-option-model-binding.md)). Heston in phase 3. | `market`, `dates` |
+| `pricer.greeks` | `Greeks` result type, shared by analytic engines and (next) bump-and-revalue. | nothing |
 
 ## Design principles
 

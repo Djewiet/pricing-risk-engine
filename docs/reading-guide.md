@@ -92,6 +92,21 @@ second instance of the same pattern: what had to be added, and what did not chan
 | [`engines/swap.py`][engine-swap] | The two-curve engine. | Module docstring (telescoping of daily compounding), `discount_swap` vectorised per leg, the rejection of an already-accruing coupon. |
 | [`validation/test_swap_quantlib.py`][val-swap] | Independent check of the telescoped formula. | QuantLib compounds day by day; agreement to 1e-8 of notional. |
 
+### Step 4c: options (45 min)
+
+Finance background: [European options and Black-Scholes](finance/black-scholes.md), then
+[ADR 0002](adr/0002-option-model-binding.md) for the model / engine split. This is the
+first place where the third leg of Instrument / Model / Engine appears.
+
+| File | Why | Look for |
+|---|---|---|
+| [`instruments/option.py`][option] | The contract. | `OptionType.sign` (the $\omega$ of the formulas, one code path for calls and puts); `payoff` vectorised over terminal spots, ready for Monte Carlo. |
+| [`models/black_scholes.py`][model-bs] | What a model is when its parameters are market data. | Module docstring (the dynamics, why only $D_r(T)$ and $D_q(T)$ matter); `BlackScholesModel.inputs` resolves the snapshot once for every engine. |
+| [`greeks/base.py`][greeks] | One result type for every way of computing Greeks. | Units: raw partial derivatives; theta convention (fixed zero rates to expiry). |
+| [`engines/analytic_european.py`][engine-bs] | The closed form and its Greeks. | Black formula on the forward; `norm_cdf` through `erfc` (tail precision); the `stdev == 0` branch (expiry today, zero vol). |
+| [`tests/engines/test_analytic_european.py`][test-bs] | How a formula is proven without QuantLib. | Parity, bounds, strike convexity and the Black-Scholes PDE under hypothesis; Greeks against snapshot bumps. |
+| [`validation/test_european_option_quantlib.py`][val-bs] | The benchmark. | 162 cases incl. a bootstrapped curve between pillars; price and six Greeks to 1e-10. |
+
 ### Step 5: analytics and risk (45 min)
 
 Finance background: [Bond analytics and risk](finance/bond-analytics.md).
@@ -114,7 +129,7 @@ Finance background: [Bond analytics and risk](finance/bond-analytics.md).
 | Coming with | New files | Reading position |
 |---|---|---|
 | Business calendars, key-rate DV01 (phase 1) | `dates/calendar.py`, `risk/` | Step 1 and step 5. |
-| Options (phase 2) | `models/`, `engines/` (analytic, tree, Monte Carlo), `greeks/` | After step 5. |
+| Options, rest of phase 2 | `greeks/` (bump Greeks), `engines/` (tree, Monte Carlo), `validation/report` | Step 4c. |
 | Risk service (phase 4) | `src/service/` | Separate route, to be written. |
 
 [readme]: https://github.com/Djewiet/pricing-risk-engine/blob/main/README.md
@@ -123,6 +138,12 @@ Finance background: [Bond analytics and risk](finance/bond-analytics.md).
 [swap]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/instruments/swap.py
 [engine-swap]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/engines/swap.py
 [val-swap]: https://github.com/Djewiet/pricing-risk-engine/blob/main/validation/test_swap_quantlib.py
+[option]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/instruments/option.py
+[model-bs]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/models/black_scholes.py
+[greeks]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/greeks/base.py
+[engine-bs]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/engines/analytic_european.py
+[test-bs]: https://github.com/Djewiet/pricing-risk-engine/blob/main/tests/engines/test_analytic_european.py
+[val-bs]: https://github.com/Djewiet/pricing-risk-engine/blob/main/validation/test_european_option_quantlib.py
 [errors]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/errors.py
 [tenor]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/dates/tenor.py
 [schedule]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/dates/schedule.py
