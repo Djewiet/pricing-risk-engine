@@ -94,9 +94,22 @@ class BlackScholesModel:
     day_count: DayCount = ACT_365F
 
     def inputs(
-        self, underlying: str, expiry: date, strike: float, market: MarketSnapshot
+        self,
+        underlying: str,
+        expiry: date,
+        strike: float,
+        market: MarketSnapshot,
+        volatility: float | None = None,
     ) -> BlackScholesInputs:
         """Resolve the model quantities for an option on ``underlying``.
+
+        Args:
+            underlying: Identifier of the spot and volatility surface in ``market``.
+            expiry: Option expiry.
+            strike: Option strike, for the volatility lookup.
+            market: Market snapshot.
+            volatility: Volatility to use instead of the surface of ``market``, which is
+                then not read (implied-volatility solving needs no surface).
 
         Raises:
             PricerError: If ``expiry`` is before the valuation date.
@@ -116,5 +129,9 @@ class BlackScholesModel:
             time_to_expiry=t,
             discount_factor=market.curve(self.discount_curve).discount(expiry),
             dividend_discount_factor=dividend,
-            volatility=market.volatility(underlying).black_vol(t, strike),
+            volatility=(
+                market.volatility(underlying).black_vol(t, strike)
+                if volatility is None
+                else volatility
+            ),
         )

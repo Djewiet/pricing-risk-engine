@@ -68,6 +68,7 @@ nav:
       - Bond analytics and risk: finance/bond-analytics.md
       - Interest rate swap: finance/interest-rate-swap.md
       - European options (Black-Scholes): finance/black-scholes.md
+      - Greeks by bump and implied volatility: finance/option-risk.md
   - Validation: validation.md
   - Development: development.md
   - Decisions:

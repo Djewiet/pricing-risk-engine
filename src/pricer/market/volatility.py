@@ -40,3 +40,32 @@ class FlatVolatility:
 
     def black_vol(self, t: float, strike: float) -> float:  # noqa: D102
         return self.sigma
+
+
+@dataclass(frozen=True, slots=True)
+class ShiftedVolatility:
+    """Volatility surface shifted in parallel: ``sigma'(t, K) = sigma(t, K) + shift``.
+
+    Wraps the base surface instead of copying it, like
+    :class:`~pricer.market.curves.ZeroSpreadedCurve` for curves: the bump used for vega by
+    bump-and-revalue, whatever the shape of the surface.
+
+    Attributes:
+        base: Surface to shift.
+        shift: Absolute volatility shift (``0.01`` for one vol point).
+    """
+
+    base: VolatilitySurface
+    shift: float
+
+    def black_vol(self, t: float, strike: float) -> float:
+        """Shifted volatility.
+
+        Raises:
+            MarketDataError: If the shift makes the volatility negative.
+        """
+        sigma = self.base.black_vol(t, strike) + self.shift
+        if sigma < 0.0:
+            msg = f"Volatility shift {self.shift} makes the volatility negative ({sigma})"
+            raise MarketDataError(msg)
+        return sigma

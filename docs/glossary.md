@@ -19,6 +19,10 @@ Black-Scholes
 :   Model in which the underlying follows a geometric Brownian motion with constant
     volatility; gives closed-form prices for European options.
 
+Bump and revalue
+:   Computing a sensitivity by repricing on a slightly modified market and taking a finite
+    difference. Works with every pricing method.
+
 Call / put
 :   Right to buy / sell the underlying at the strike. European: exercisable at expiry only;
     American: at any time up to expiry.
@@ -70,6 +74,9 @@ Put-call parity
 
 Pillar
 :   A node of the curve where the discount factor is solved; interpolation in between.
+
+Roll-down
+:   Change of the zero rate to a fixed date as time passes along a sloped curve.
 
 Settlement date
 :   Date the trade is exchanged against cash; price and accrued interest refer to it.

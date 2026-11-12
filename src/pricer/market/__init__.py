@@ -10,13 +10,14 @@ from pricer.market.curves import (
     Compounding,
     DiscountCurve,
     FlatForwardCurve,
+    RolledCurve,
     YieldCurve,
     ZeroSpreadedCurve,
     discount_from_rate,
     rate_from_discount,
 )
 from pricer.market.snapshot import MarketSnapshot
-from pricer.market.volatility import FlatVolatility, VolatilitySurface
+from pricer.market.volatility import FlatVolatility, ShiftedVolatility, VolatilitySurface
 
 __all__ = [
     "Compounding",
@@ -26,6 +27,8 @@ __all__ = [
     "MarketSnapshot",
     "ParBondConvention",
     "ParYieldQuote",
+    "RolledCurve",
+    "ShiftedVolatility",
     "VolatilitySurface",
     "YieldCurve",
     "ZeroSpreadedCurve",

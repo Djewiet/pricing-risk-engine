@@ -90,10 +90,10 @@ flowchart TB
 | `pricer.market` | Curves, bootstrap, volatility, `MarketSnapshot`, data loaders. | `dates`, `errors` |
 | `pricer.instruments` | Contract terms and contractual cash flows. No pricing. | `dates` |
 | `pricer.engines` | Valuation methods, one class per (instrument, method). | `instruments`, `market` |
-| `pricer.analytics` | Instrument measures that need a price or a yield, not a full market (YTM, duration, z-spread). | `engines`, `instruments`, `market` |
+| `pricer.analytics` | Instrument measures derived from a quoted price (YTM, duration, z-spread, implied volatility). | `engines`, `instruments`, `market` |
 | `pricer.risk` | Bump-and-revalue sensitivities on a snapshot. | `market` |
 | `pricer.models` | Model dynamics bound to the snapshot: `BlackScholesModel` resolves spot, discount factors and volatility for one option ([ADR 0002](../adr/0002-option-model-binding.md)). Heston in phase 3. | `market`, `dates` |
-| `pricer.greeks` | `Greeks` result type, shared by analytic engines and (next) bump-and-revalue. | nothing |
+| `pricer.greeks` | `Greeks` result type, shared by analytic engines and `bump_greeks` (bump-and-revalue on any `MarketSnapshot -> float`). | `market` |
 
 ## Design principles
 

@@ -15,11 +15,11 @@ from __future__ import annotations
 import math
 from collections.abc import Mapping
 from dataclasses import dataclass, field, replace
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from types import MappingProxyType
 
 from pricer.errors import MarketDataError, MissingMarketDataError
-from pricer.market.curves import YieldCurve
+from pricer.market.curves import RolledCurve, YieldCurve
 from pricer.market.volatility import VolatilitySurface
 
 
@@ -108,6 +108,28 @@ class MarketSnapshot:
     def with_volatility(self, name: str, surface: VolatilitySurface) -> MarketSnapshot:
         """Return a copy with volatility ``name`` added or replaced."""
         return replace(self, volatilities={**self.volatilities, name: surface})
+
+    def roll_forward(self, days: int) -> MarketSnapshot:
+        """Return the market ``days`` calendar days later, all else being equal.
+
+        Spots and volatility surfaces are unchanged; every curve is rolled with
+        :class:`~pricer.market.curves.RolledCurve`, so forward rates are realised. This is
+        the scenario behind bump-and-revalue theta: the value change when only time passes.
+
+        Raises:
+            ValueError: If ``days`` is negative.
+        """
+        if days < 0:
+            msg = f"Cannot roll a market snapshot backwards ({days} days)"
+            raise ValueError(msg)
+        step = timedelta(days=days)
+        valuation = self.valuation_date + step
+        return replace(
+            self,
+            timestamp=self.timestamp + step,
+            valuation_date=valuation,
+            curves={name: RolledCurve(c, valuation) for name, c in self.curves.items()},
+        )
 
 
 def _lookup[V](mapping: Mapping[str, V], name: str, kind: str) -> V:

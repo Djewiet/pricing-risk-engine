@@ -9,7 +9,8 @@ independent implementation.
     Phase 1: dates and day counts, immutable market snapshot, yield-curve bootstrap from
     US Treasury par yields, fixed-rate bonds (pricing, yield, durations, convexity,
     z-spread, curve DV01), vanilla interest rate swaps on separate forecast and discount
-    curves. Phase 2 so far: European options under Black-Scholes, with analytic Greeks.
+    curves. Phase 2 so far: European options under Black-Scholes, analytic and bump-and-revalue
+    Greeks, implied volatility.
     Everything is benchmarked against QuantLib. See the [roadmap](roadmap.md).
 
 ## What is in the box
@@ -20,8 +21,8 @@ independent implementation.
 | Instruments | `FixedRateBond`, `InterestRateSwap`, `EuropeanOption` (contract terms, cash flows, payoffs) | [Fixed-rate bond](finance/fixed-rate-bond.md), [Swap](finance/interest-rate-swap.md), [Options](finance/black-scholes.md) |
 | Models | `BlackScholesModel`: which snapshot curves play $r$ and $q$ | [ADR 0002](adr/0002-option-model-binding.md) |
 | Engines | `DiscountingBondEngine`, `DiscountingSwapEngine` (two curves), `AnalyticEuropeanEngine` (Black-Scholes and Greeks) | [Data flow](architecture/data-flow.md) |
-| Analytics and risk | YTM, durations, convexity, z-spread, yield and curve DV01 | [Bond analytics](finance/bond-analytics.md) |
-| Validation | 222 QuantLib cases, closed forms, property-based tests | [Validation](validation.md) |
+| Analytics and risk | YTM, durations, convexity, z-spread, yield and curve DV01; option Greeks by bump, implied volatility | [Bond analytics](finance/bond-analytics.md), [Option risk](finance/option-risk.md) |
+| Validation | 312 QuantLib cases, closed forms, property-based tests | [Validation](validation.md) |
 
 ## How this documentation is organised
 
