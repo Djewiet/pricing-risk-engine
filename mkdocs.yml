@@ -69,6 +69,7 @@ nav:
       - Interest rate swap: finance/interest-rate-swap.md
       - European options (Black-Scholes): finance/black-scholes.md
       - Greeks by bump and implied volatility: finance/option-risk.md
+      - American options and the binomial tree: finance/american-options.md
   - Validation: validation.md
   - Development: development.md
   - Decisions:

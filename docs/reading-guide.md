@@ -100,7 +100,7 @@ first place where the third leg of Instrument / Model / Engine appears.
 
 | File | Why | Look for |
 |---|---|---|
-| [`instruments/option.py`][option] | The contract. | `OptionType.sign` (the $\omega$ of the formulas, one code path for calls and puts); `payoff` vectorised over terminal spots, ready for Monte Carlo. |
+| [`instruments/option.py`][option] | The contracts. | `VanillaOption` holds the shared terms, `EuropeanOption` / `AmericanOption` only fix `early_exercise`; `OptionType.sign` (the $\omega$ of the formulas, one code path for calls and puts); `payoff` vectorised over terminal spots, ready for Monte Carlo. |
 | [`models/black_scholes.py`][model-bs] | What a model is when its parameters are market data. | Module docstring (the dynamics, why only $D_r(T)$ and $D_q(T)$ matter); `BlackScholesModel.inputs` resolves the snapshot once for every engine. |
 | [`greeks/base.py`][greeks] | One result type for every way of computing Greeks. | Units: raw partial derivatives; theta convention (fixed zero rates to expiry). |
 | [`engines/analytic_european.py`][engine-bs] | The closed form and its Greeks. | Black formula on the forward; `norm_cdf` through `erfc` (tail precision); the `stdev == 0` branch (expiry today, zero vol). |
@@ -108,6 +108,7 @@ first place where the third leg of Instrument / Model / Engine appears.
 | [`validation/test_european_option_quantlib.py`][val-bs] | The benchmark. | 162 cases incl. a bootstrapped curve between pillars; price and six Greeks to 1e-10. |
 | [`greeks/bump.py`][bump] | Greeks for any engine. | Takes a `MarketSnapshot -> float` like `parallel_dv01`; the bump size trade-off (module docstring); theta by rolling the whole market. Background: [Greeks by bump and implied volatility](finance/option-risk.md). |
 | [`market/curves.py`][curves] (`RolledCurve`), [`market/volatility.py`][volatility] (`ShiftedVolatility`) | The market scenarios behind theta and vega. | Two decorators, like `ZeroSpreadedCurve`: they wrap, they do not copy. `RolledCurve` keeps forwards. |
+| [`engines/binomial.py`][tree] | A second engine for the same model, and the first for American options. Background: [American options and the binomial tree](finance/american-options.md). | `VanillaOption.early_exercise` read at each node instead of an `isinstance`; one vectorised operation per time step; Greeks from the first two steps; the `p` validity check. |
 | [`analytics/option.py`][iv] | Implied volatility. | Bounds check before solving (existence and uniqueness), bracket doubling, why Brent rather than Newton. |
 
 ### Step 5: analytics and risk (45 min)
@@ -132,7 +133,7 @@ Finance background: [Bond analytics and risk](finance/bond-analytics.md).
 | Coming with | New files | Reading position |
 |---|---|---|
 | Business calendars, key-rate DV01 (phase 1) | `dates/calendar.py`, `risk/` | Step 1 and step 5. |
-| Options, rest of phase 2 | `engines/` (tree, Monte Carlo), `validation/report` | Step 4c. |
+| Options, rest of phase 2 | `engines/` (Monte Carlo), `validation/report` | Step 4c. |
 | Risk service (phase 4) | `src/service/` | Separate route, to be written. |
 
 [readme]: https://github.com/Djewiet/pricing-risk-engine/blob/main/README.md
@@ -149,6 +150,7 @@ Finance background: [Bond analytics and risk](finance/bond-analytics.md).
 [val-bs]: https://github.com/Djewiet/pricing-risk-engine/blob/main/validation/test_european_option_quantlib.py
 [bump]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/greeks/bump.py
 [iv]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/analytics/option.py
+[tree]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/engines/binomial.py
 [errors]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/errors.py
 [tenor]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/dates/tenor.py
 [schedule]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/dates/schedule.py

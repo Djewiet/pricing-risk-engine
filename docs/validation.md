@@ -45,6 +45,9 @@ hypothesis (property-based testing).
 - Bump-and-revalue Greeks match the analytic ones; a rolled curve keeps its forward rates;
   bump theta is the exact one-day value change on flat curves and differs from the analytic
   theta by rho times the roll-down on a sloped curve.
+- Binomial tree: European put-call parity exact at any number of steps, American ≥
+  max(European, payoff), American call without dividends = European call (Merton),
+  American put with negative rates = European put, American value increasing in maturity.
 - Implied volatility: price → vol → price round trip, call and put imply the same vol,
   prices outside the no-arbitrage bounds are rejected.
 
@@ -63,6 +66,8 @@ not a modelling choice.
 | Swap | 6 swaps × (single, two-curve) | NPV, leg PVs | $10^{-8} \times N$ | Well below a cent per million; QuantLib compounds daily, we telescope |
 | | | Par rate | $10^{-12}$ | |
 | Implied volatility | 90 cases: 5 strikes × 3 expiries × 3 vols (5%–120%) × call/put | Volatility | $10^{-10}$ + $10^{-14} V/\text{vega}$ | A price known to $\varepsilon$ fixes $\sigma$ to $\varepsilon/\text{vega}$; observed $\le 3.1 \times 10^{-12}$; 8 cases with time value at noise level check repricing |
+| CRR tree (American and European) | 3 spots × 3 expiries × 2 rates × 2 dividend yields × 2 vols × call/put, both styles: 288 cases at N = 1000 | Price, delta, gamma, theta | $3 \times 10^{-3}$, $10^{-4}$, $2 \times 10^{-3}$ rel., $5 \times 10^{-3}$ | QuantLib's CRR uses a first-order expansion of our up probability: the trees differ by O(1/N); observed price gap $\le 1.6 \times 10^{-3}$. Theta differs by definition where the option is exercised today (see the American options page) |
+| American option vs PDE | 24 cases, tree N = 2000 vs `FdBlackScholesVanillaEngine` 800 × 800 | Price | $5 \times 10^{-3}$ | Independent numerical method, both errors ~$10^{-3}$ |
 | European option (Black-Scholes) | 144 flat markets (3 spots × 3 expiries × 2 rates incl. negative × 2 dividend yields × 2 vols × call/put) + 18 on a bootstrapped curve | Price, delta, gamma, vega, theta, rho, dividend rho | $10^{-10}$ relative, $10^{-12}$ absolute | Same closed form on both sides; observed $\le 1.1 \times 10^{-13}$ |
 
 The reference dates are chosen to break date generation: 29 and 31 August, 29 February,

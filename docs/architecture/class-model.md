@@ -299,3 +299,52 @@ of the snapshot play the risk-free and dividend roles and turns the snapshot int
 `BlackScholesInputs`; the **engine** only applies a formula to those inputs. The tree and
 Monte Carlo engines of phase 2 take the same model, so the three methods price one model
 by construction ([ADR 0002](../adr/0002-option-model-binding.md)).
+
+## American option and the binomial tree
+
+```mermaid
+classDiagram
+    direction LR
+    class VanillaOption {
+        <<frozen, abstract>>
+        +early_exercise bool$
+        +underlying str
+        +strike float
+        +expiry date
+        +option_type OptionType
+        +payoff(spots ndarray) ndarray
+    }
+    class EuropeanOption {
+        +early_exercise = False$
+    }
+    class AmericanOption {
+        +early_exercise = True$
+    }
+    class BinomialTreeEngine {
+        <<frozen>>
+        +model BlackScholesModel
+        +steps int
+        +price(option, market) TreeValuation
+    }
+    class TreeValuation {
+        <<frozen>>
+        +npv float
+        +delta float
+        +gamma float
+        +theta float
+        +steps int
+    }
+    class BlackScholesModel
+
+    VanillaOption <|-- EuropeanOption
+    VanillaOption <|-- AmericanOption
+    BinomialTreeEngine o-- BlackScholesModel
+    BinomialTreeEngine ..> VanillaOption : prices both styles
+    BinomialTreeEngine ..> TreeValuation : returns
+```
+
+The exercise style is a class-level contract term, `early_exercise`. The tree engine reads
+it at each node (`max(continuation, payoff)` when it is true) instead of testing the class
+of the instrument, so a Bermudan option (exercise on a list of dates) would add a term,
+not a branch. The analytic engine stays typed on `EuropeanOption`: mypy rejects pricing an
+American option in closed form.

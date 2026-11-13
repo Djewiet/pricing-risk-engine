@@ -13,14 +13,16 @@ service built on top of it.
 > immutable market snapshot, yield-curve bootstrap from US Treasury par yields, fixed-rate
 > bonds (pricing, yield, durations, convexity, z-spread, curve DV01) and vanilla interest
 > rate swaps on separate forecast and discount curves. Phase 2 so far: European options
-> under Black-Scholes, analytic and bump-and-revalue Greeks, implied volatility. Every formula is validated against QuantLib.
+> under Black-Scholes, analytic and bump-and-revalue Greeks, implied volatility, American
+> options on a CRR binomial tree. Every formula is validated against QuantLib.
 
 **Documentation:** <https://djewiet.github.io/pricing-risk-engine/>, with a
 [reading guide](docs/reading-guide.md) (which files to read, in which order, and why), the
 [architecture](docs/architecture/index.md), and the finance behind each model
 ([curve](docs/finance/yield-curve.md), [bond](docs/finance/fixed-rate-bond.md),
 [analytics](docs/finance/bond-analytics.md), [swap](docs/finance/interest-rate-swap.md),
-[options](docs/finance/black-scholes.md), [option risk](docs/finance/option-risk.md)).
+[options](docs/finance/black-scholes.md), [option risk](docs/finance/option-risk.md),
+[American options](docs/finance/american-options.md)).
 
 ## Quickstart
 
@@ -128,7 +130,7 @@ flowchart LR
 - **Explicit conventions.** Day counts, schedules, compounding and the curve time axis are
   always explicit; nothing is rolled or adjusted silently.
 - **Independent validation.** Closed forms, arbitrage properties (hypothesis) and a QuantLib
-  benchmark with identical conventions: 312 cases, discount factors to 1e-11, bond prices
+  benchmark with identical conventions: 624 cases, discount factors to 1e-11, bond prices
   to 1e-10, swap NPVs to 1e-8 of notional, option prices, Greeks and implied
   volatilities to 1e-10.
 
@@ -142,7 +144,7 @@ src/pricer/
   dates/        tenors, schedules, day-count conventions
   market/       yield curves, bootstrap, volatility, MarketSnapshot
     sources/    public market-data loaders (US Treasury)
-  instruments/  contract terms and cash flows (FixedRateBond, InterestRateSwap, EuropeanOption)
+  instruments/  contract terms and cash flows (bond, swap, European and American options)
   models/       model dynamics bound to the snapshot (BlackScholesModel)
   engines/      pricing engines, injected per instrument
   greeks/       option sensitivities: Greeks type, bump-and-revalue
@@ -157,7 +159,7 @@ docs/           MkDocs site: reading guide, architecture, finance notes, ADRs
 ## Roadmap
 
 1. **Foundations**: curve, bonds, swaps (done); calendars, key-rate DV01.
-2. **Options**: Black-Scholes, analytic and bump Greeks, implied vol (done); CRR tree,
+2. **Options**: Black-Scholes, Greeks, implied vol, CRR tree for American options (done);
    Monte Carlo, validation report.
 3. **Heston and performance**: NumPy → Numba → multi-process, benchmarked.
 4. **Risk service**: Redis Streams, worker pool, FastAPI + WebSocket, VaR, PostgreSQL.

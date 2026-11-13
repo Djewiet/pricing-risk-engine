@@ -57,14 +57,14 @@ flowchart TB
         tsy["market.sources.us_treasury"]
     end
     subgraph L2["Contracts"]
-        instr["instruments<br/>bond, cashflows, swap, option"]
+        instr["instruments<br/>bond, cashflows, swap, option (European, American)"]
         greeks["greeks"]
     end
     subgraph LM["Models"]
         models["models<br/>black_scholes"]
     end
     subgraph L3["Computation"]
-        eng["engines<br/>base, bond, swap, analytic_european"]
+        eng["engines<br/>base, bond, swap, analytic_european, binomial"]
     end
     subgraph L4["Measures"]
         risk["risk.curve"]
