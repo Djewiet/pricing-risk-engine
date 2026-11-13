@@ -16,7 +16,6 @@ Two grids:
 
 import itertools
 from datetime import UTC, date, datetime
-from typing import Any
 
 import pytest
 
@@ -24,7 +23,6 @@ from pricer.dates import Tenor
 from pricer.engines import AnalyticEuropeanEngine
 from pricer.instruments import EuropeanOption, OptionType
 from pricer.market import (
-    DiscountCurve,
     FlatForwardCurve,
     FlatVolatility,
     MarketSnapshot,
@@ -33,10 +31,10 @@ from pricer.market import (
     bootstrap_par_yield_curve,
 )
 from pricer.models import BlackScholesModel
+from validation.quantlib_setup import VALUATION, analytic_option
 
 ql = pytest.importorskip("QuantLib")
 
-VALUATION = date(2025, 11, 12)
 STRIKE = 100.0
 SPOTS = (80.0, 100.0, 120.0)
 EXPIRIES = (date(2025, 12, 12), date(2026, 11, 12), date(2030, 11, 12))
@@ -61,42 +59,6 @@ GREEKS = (
 )
 
 
-def to_ql(d: date) -> Any:
-    return ql.Date(d.day, d.month, d.year)
-
-
-def ql_curve(curve: YieldCurve) -> Any:
-    if isinstance(curve, FlatForwardCurve):
-        return ql.FlatForward(to_ql(curve.reference_date), curve.rate, ql.Actual365Fixed())
-    assert isinstance(curve, DiscountCurve)
-    dates = [curve.reference_date, *curve.pillar_dates]
-    curve_ql = ql.DiscountCurve(
-        [to_ql(d) for d in dates], [1.0, *curve.pillar_discounts], ql.Actual365Fixed()
-    )
-    curve_ql.enableExtrapolation()
-    return curve_ql
-
-
-def quantlib_option(
-    option: EuropeanOption, spot: float, rates: YieldCurve, dividends: YieldCurve, vol: float
-) -> Any:
-    ql.Settings.instance().evaluationDate = to_ql(VALUATION)
-    process = ql.BlackScholesMertonProcess(
-        ql.QuoteHandle(ql.SimpleQuote(spot)),
-        ql.YieldTermStructureHandle(ql_curve(dividends)),
-        ql.YieldTermStructureHandle(ql_curve(rates)),
-        ql.BlackVolTermStructureHandle(
-            ql.BlackConstantVol(to_ql(VALUATION), ql.NullCalendar(), vol, ql.Actual365Fixed())
-        ),
-    )
-    ql_type = ql.Option.Call if option.option_type is OptionType.CALL else ql.Option.Put
-    theirs = ql.VanillaOption(
-        ql.PlainVanillaPayoff(ql_type, option.strike), ql.EuropeanExercise(to_ql(option.expiry))
-    )
-    theirs.setPricingEngine(ql.AnalyticEuropeanEngine(process))
-    return theirs
-
-
 def compare(
     option: EuropeanOption, spot: float, rates: YieldCurve, dividends: YieldCurve, vol: float
 ) -> None:
@@ -108,7 +70,7 @@ def compare(
         volatilities={option.underlying: FlatVolatility(vol)},
     )
     ours = AnalyticEuropeanEngine(BlackScholesModel("R", "Q")).price(option, market)
-    theirs = quantlib_option(option, spot, rates, dividends, vol)
+    theirs = analytic_option(option, spot, rates, dividends, vol)
     assert ours.npv == pytest.approx(theirs.NPV(), rel=RTOL, abs=ATOL)
     for name, ql_name in GREEKS:
         expected = getattr(theirs, ql_name)()
@@ -145,8 +107,12 @@ TREASURY = bootstrap_par_yield_curve(
 )  # fmt: skip
 
 
-@pytest.mark.parametrize("expiry", [date(2026, 1, 16), date(2027, 3, 19), date(2032, 12, 17)])
-@pytest.mark.parametrize("strike", [80.0, 100.0, 125.0])
+TERM_STRUCTURE_EXPIRIES = (date(2026, 1, 16), date(2027, 3, 19), date(2032, 12, 17))
+TERM_STRUCTURE_STRIKES = (80.0, 100.0, 125.0)
+
+
+@pytest.mark.parametrize("expiry", TERM_STRUCTURE_EXPIRIES)
+@pytest.mark.parametrize("strike", TERM_STRUCTURE_STRIKES)
 @pytest.mark.parametrize("option_type", TYPES)
 def test_term_structure_matches_quantlib(
     expiry: date, strike: float, option_type: OptionType

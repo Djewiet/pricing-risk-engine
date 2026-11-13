@@ -16,7 +16,7 @@ from pricer.errors import PricerError
 from pricer.instruments import EuropeanOption, OptionType
 from pricer.market import FlatForwardCurve, MarketSnapshot
 from pricer.models import BlackScholesModel
-from validation.test_european_option_quantlib import VALUATION, quantlib_option
+from validation.quantlib_setup import VALUATION, analytic_option, bsm_process
 
 ql = pytest.importorskip("QuantLib")
 
@@ -30,7 +30,6 @@ SPOT, RATE, DIVIDEND = 100.0, 0.04, 0.015
 # ~1e-14 relative only fixes sigma to ~1e-14 price / vega, added per case. Where the time
 # value is at double-precision noise level (8 of the 90 cases), the test checks repricing.
 VOL_ATOL = 1e-10
-QL_TODAY = ql.Date(12, 11, 2025)
 
 
 def _market(rates: FlatForwardCurve, dividends: FlatForwardCurve) -> MarketSnapshot:
@@ -53,7 +52,7 @@ def test_implied_volatility_matches_quantlib(
     option = EuropeanOption("X", strike, expiry, option_type)
     rates = FlatForwardCurve(VALUATION, RATE)
     dividends = FlatForwardCurve(VALUATION, DIVIDEND)
-    theirs = quantlib_option(option, SPOT, rates, dividends, vol)
+    theirs = analytic_option(option, SPOT, rates, dividends, vol)
     price = theirs.NPV()
     vega = theirs.vega()
     market = _market(rates, dividends)
@@ -70,19 +69,12 @@ def test_implied_volatility_matches_quantlib(
             ours = implied_volatility(option, price, model, market)
         except PricerError:
             return
-        repriced = quantlib_option(option, SPOT, rates, dividends, ours).NPV()
+        repriced = analytic_option(option, SPOT, rates, dividends, ours).NPV()
         assert repriced == pytest.approx(price, abs=1e-14 * SPOT)
         return
 
     ours = implied_volatility(option, price, model, market)
-    process = ql.BlackScholesMertonProcess(
-        ql.QuoteHandle(ql.SimpleQuote(SPOT)),
-        ql.YieldTermStructureHandle(ql.FlatForward(QL_TODAY, DIVIDEND, ql.Actual365Fixed())),
-        ql.YieldTermStructureHandle(ql.FlatForward(QL_TODAY, RATE, ql.Actual365Fixed())),
-        ql.BlackVolTermStructureHandle(
-            ql.BlackConstantVol(QL_TODAY, ql.NullCalendar(), 0.3, ql.Actual365Fixed())
-        ),
-    )
+    process = bsm_process(SPOT, rates, dividends, 0.3)
     implied_ql = theirs.impliedVolatility(price, process, 1e-12, 500, 1e-7, 10.0)
     tolerance = VOL_ATOL + 1e-14 * max(price, 1.0) / vega
     assert ours == pytest.approx(implied_ql, abs=tolerance)

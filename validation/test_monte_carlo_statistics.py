@@ -20,7 +20,7 @@ from pricer.engines import monte_carlo_european
 from pricer.instruments import EuropeanOption, OptionType
 from pricer.market import FlatForwardCurve
 from pricer.models import BlackScholesInputs
-from validation.test_european_option_quantlib import VALUATION, quantlib_option
+from validation.quantlib_setup import VALUATION, analytic_option
 
 ql = pytest.importorskip("QuantLib")
 
@@ -47,7 +47,7 @@ def test_confidence_intervals_have_nominal_coverage(
     strike: float, option_type: OptionType, antithetic: bool, control_variate: bool
 ) -> None:
     option = EuropeanOption("X", strike, EXPIRY, option_type)
-    reference = quantlib_option(
+    reference = analytic_option(
         option,
         SPOT,
         FlatForwardCurve(VALUATION, RATE),

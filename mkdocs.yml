@@ -71,7 +71,9 @@ nav:
       - Greeks by bump and implied volatility: finance/option-risk.md
       - American options and the binomial tree: finance/american-options.md
       - Monte Carlo pricing: finance/monte-carlo.md
-  - Validation: validation.md
+  - Validation:
+      - Approach and tolerances: validation.md
+      - Model Validation Report: validation-report/index.md
   - Development: development.md
   - Decisions:
       - ADR 0001 Yield curve: adr/0001-yield-curve-bootstrap.md

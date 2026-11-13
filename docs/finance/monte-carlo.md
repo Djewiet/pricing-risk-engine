@@ -109,7 +109,8 @@ against a fixed tolerance.
 | Put-call parity with the control variate | same | exact to $10^{-12}$ |
 | Zero volatility, expiry today, reproducibility | same | deterministic values |
 | Delta, vega, rho by bump with common random numbers | same | within 1% of analytic |
-| **Coverage of the 95% confidence interval** over 400 independent seeds, 24 cases, against QuantLib's closed form | `validation/test_monte_carlo_statistics.py` | coverage 93.3% to 95.5% (band 91.7%–98.3%); mean of $z$ within $\pm 0.14$; variance of $z$ 0.96 to 1.09 |
+| Convergence order of the RMSE and of the standard error, per variance-reduction setting | `validation/test_convergence.py` | slopes near $-1/2$ ([plot](../validation-report/index.md#convergence-of-monte-carlo)) |
+| **Coverage of the 95% confidence interval** over 400 independent seeds, 24 cases, against QuantLib's closed form | `validation/test_monte_carlo_statistics.py` | coverage within the band 91.7%–98.3%; mean of $z$ within $\pm 0.2$; variance of $z$ 0.75 to 1.3 ([observed values](../validation-report/index.md#monte-carlo-error-model)) |
 
 The coverage test is the one that would catch the classic mistakes: a biased estimator
 shifts the mean of $z$, and a standard error computed on correlated antithetic values

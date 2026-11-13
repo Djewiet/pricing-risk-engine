@@ -71,8 +71,9 @@ not a modelling choice.
 | Implied volatility | 90 cases: 5 strikes × 3 expiries × 3 vols (5%–120%) × call/put | Volatility | $10^{-10}$ + $10^{-14} V/\text{vega}$ | A price known to $\varepsilon$ fixes $\sigma$ to $\varepsilon/\text{vega}$; observed $\le 3.1 \times 10^{-12}$; 8 cases with time value at noise level check repricing |
 | CRR tree (American and European) | 3 spots × 3 expiries × 2 rates × 2 dividend yields × 2 vols × call/put, both styles: 288 cases at N = 1000 | Price, delta, gamma, theta | $3 \times 10^{-3}$, $10^{-4}$, $2 \times 10^{-3}$ rel., $5 \times 10^{-3}$ | QuantLib's CRR uses a first-order expansion of our up probability: the trees differ by O(1/N); observed price gap $\le 1.6 \times 10^{-3}$. Theta differs by definition where the option is exercised today (see the American options page) |
 | American option vs PDE | 24 cases, tree N = 2000 vs `FdBlackScholesVanillaEngine` 800 × 800 | Price | $5 \times 10^{-3}$ | Independent numerical method, both errors ~$10^{-3}$ |
-| Monte Carlo (statistical) | 3 strikes × call/put × antithetic on/off × control variate on/off; 400 seeds × 2,000 paths each | Coverage of the 95% interval; mean and variance of $z = (\hat V - V)/\text{s.e.}$ | coverage in [91.7%, 98.3%], mean $\pm 0.2$, variance [0.75, 1.3] | $\pm 3\sigma$ sampling bands for 400 seeds; observed coverage 93.3%–95.5% |
+| Monte Carlo (statistical) | 3 strikes × call/put × antithetic on/off × control variate on/off; 400 seeds × 2,000 paths each | Coverage of the 95% interval; mean and variance of $z = (\hat V - V)/\text{s.e.}$ | coverage in [91.7%, 98.3%], mean $\pm 0.2$, variance [0.75, 1.3] | $\pm 3\sigma$ sampling bands for 400 seeds; observed values in the [report](validation-report/index.md#monte-carlo-error-model) |
 | European option (Black-Scholes) | 144 flat markets (3 spots × 3 expiries × 2 rates incl. negative × 2 dividend yields × 2 vols × call/put) + 18 on a bootstrapped curve | Price, delta, gamma, vega, theta, rho, dividend rho | $10^{-10}$ relative, $10^{-12}$ absolute | Same closed form on both sides; observed $\le 1.1 \times 10^{-13}$ |
+| Convergence orders | ATM 1Y put: tree N = 50 to 1600 (even and odd), Monte Carlo 1,000 to 64,000 paths × 50 seeds, 4 settings | Log-log slope of the error | tree $[-1.05, -0.95]$, sign by parity; MC standard error $[-0.52, -0.48]$, RMSE $[-0.6, -0.4]$ | Theory: $-1$ and $-1/2$; the RMSE band is wider because 50 seeds give a noisy RMSE |
 
 The reference dates are chosen to break date generation: 29 and 31 August, 29 February,
 31 January, mid-month, the last business day of a year.
@@ -93,14 +94,27 @@ the benchmark tests the conventions.
 
 ```bash
 uv run pytest --cov          # tests/ with the 90% coverage gate (no QuantLib needed)
-uv run pytest validation     # QuantLib suite
+uv run pytest validation     # QuantLib suite, convergence orders, report generation
+uv run python -m validation.report   # regenerate docs/validation-report/
 ```
 
 In CI, unit tests run without QuantLib (`uv sync --no-group validation`), and the
 benchmark runs as its own job, so a QuantLib installation problem can never hide a unit
 test failure.
 
-## Planned
+## Model Validation Report
 
-A generated **Model Validation Report** (phase 2): methodology, error tables, convergence
-plots for Monte Carlo and trees, known limitations.
+The [Model Validation Report](validation-report/index.md) gathers the option results in
+one document, the way a model validation team would read them: methodology, the worst
+observed error of every QuantLib comparison next to its tolerance, the statistical
+calibration of the Monte Carlo standard errors, convergence studies with plots (CRR tree
+in $O(1/N)$ with its parity oscillation, Monte Carlo in $O(1/\sqrt{n})$ for each variance
+reduction) and the known limitations of the models.
+
+The report is **generated, not written**: `uv run python -m validation.report` recomputes
+every number (fixed grids and seeds) and rewrites `docs/validation-report/`. The grids are
+imported from the `validation/test_*` suites, so the report and the tests cover the same
+cases; `validation/test_convergence.py` asserts the convergence orders and
+`validation/test_report.py` regenerates the report and fails if any benchmark is out of
+tolerance. The generated files are committed so that the documentation build does not
+need QuantLib.

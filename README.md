@@ -130,9 +130,10 @@ flowchart LR
 - **Explicit conventions.** Day counts, schedules, compounding and the curve time axis are
   always explicit; nothing is rolled or adjusted silently.
 - **Independent validation.** Closed forms, arbitrage properties (hypothesis) and a QuantLib
-  benchmark with identical conventions: 648 cases, discount factors to 1e-11, bond prices
+  benchmark with identical conventions: 655 cases, discount factors to 1e-11, bond prices
   to 1e-10, swap NPVs to 1e-8 of notional, option prices, Greeks and implied
-  volatilities to 1e-10.
+  volatilities to 1e-10. Everything is gathered in a generated
+  [Model Validation Report](docs/validation-report/index.md) with convergence plots.
 
 More diagrams (module layers, class model, pricing sequences) in
 [docs/architecture](docs/architecture/index.md).
@@ -160,10 +161,10 @@ docs/           MkDocs site: reading guide, architecture, finance notes, ADRs
 
 1. **Foundations**: curve, bonds, swaps (done); calendars, key-rate DV01.
 2. **Options**: Black-Scholes, Greeks, implied vol, CRR tree for American options, Monte
-   Carlo (done); validation report.
+   Carlo, generated Model Validation Report (done).
 3. **Heston and performance**: NumPy → Numba → multi-process, benchmarked.
 4. **Risk service**: Redis Streams, worker pool, FastAPI + WebSocket, VaR, PostgreSQL.
-5. **Polish**: Prometheus/Grafana, published validation report.
+5. **Polish**: Prometheus/Grafana, report extended to Heston and VaR.
 
 Details in [docs/roadmap.md](docs/roadmap.md). Design decisions are recorded as
 [ADRs](docs/adr/).
