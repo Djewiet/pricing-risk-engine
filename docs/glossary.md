@@ -15,6 +15,10 @@ Clean / dirty price
 :   Dirty (full) price is what is paid; clean price = dirty − accrued interest, and is
     what the market quotes.
 
+Binomial tree (CRR)
+:   Discrete model in which the spot moves up or down by fixed factors at each step; values
+    are computed backwards from expiry. Prices American options.
+
 Black-Scholes
 :   Model in which the underlying follows a geometric Brownian motion with constant
     volatility; gives closed-form prices for European options.
@@ -46,6 +50,9 @@ DV01 / PV01
 Forecast / discount curve
 :   The curve projecting a floating index vs the curve discounting cash flows (the
     collateral rate). Equal in a single-curve setup.
+
+Early exercise premium
+:   Value of the right to exercise before expiry: American minus European price.
 
 Forward price
 :   $F = S D_q / D_r$: the delivery price that makes a forward contract worth zero today.

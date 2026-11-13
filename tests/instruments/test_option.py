@@ -4,7 +4,7 @@ from datetime import date
 import numpy as np
 import pytest
 
-from pricer.instruments import EuropeanOption, OptionType
+from pricer.instruments import AmericanOption, EuropeanOption, OptionType, VanillaOption
 
 EXPIRY = date(2026, 6, 19)
 
@@ -34,3 +34,19 @@ def test_alive_on_expiry_date() -> None:
     option = EuropeanOption("X", 100.0, EXPIRY, OptionType.CALL)
     assert not option.is_expired(EXPIRY)
     assert option.is_expired(date(2026, 6, 20))
+
+
+def test_exercise_style_is_a_contract_term() -> None:
+    european = EuropeanOption("X", 100.0, EXPIRY, OptionType.PUT)
+    american = AmericanOption("X", 100.0, EXPIRY, OptionType.PUT)
+    assert not european.early_exercise
+    assert american.early_exercise
+    assert european != american  # type: ignore[comparison-overlap]  # different contracts
+    np.testing.assert_array_equal(american.payoff(np.array([90.0])), [10.0])
+
+
+def test_vanilla_option_is_abstract() -> None:
+    with pytest.raises(TypeError, match="abstract"):
+        VanillaOption("X", 100.0, EXPIRY, OptionType.CALL)
+    with pytest.raises(ValueError, match="Strike"):
+        AmericanOption("X", -1.0, EXPIRY, OptionType.CALL)

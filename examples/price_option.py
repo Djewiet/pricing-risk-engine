@@ -2,8 +2,8 @@
 
 Discounting uses the bootstrapped Treasury curve (same quotes as ``price_bond.py``), the
 dividend yield is a flat curve, the volatility is flat. The analytic Greeks are printed in
-market units, compared with bump-and-revalue Greeks, and a quoted price is inverted into an
-implied volatility.
+market units and compared with bump-and-revalue Greeks; an American put is priced on a
+binomial tree; a quoted price is inverted into an implied volatility.
 
 Run it with ``uv run python examples/price_option.py``.
 """
@@ -14,9 +14,9 @@ from datetime import UTC, date, datetime
 
 from pricer.analytics import implied_volatility
 from pricer.dates import Tenor
-from pricer.engines import AnalyticEuropeanEngine
+from pricer.engines import AnalyticEuropeanEngine, BinomialTreeEngine
 from pricer.greeks import bump_greeks
-from pricer.instruments import EuropeanOption, OptionType
+from pricer.instruments import AmericanOption, EuropeanOption, OptionType
 from pricer.market import (
     FlatForwardCurve,
     FlatVolatility,
@@ -88,6 +88,15 @@ def main() -> None:
         f"call theta/day: analytic {analytic.theta_per_day:+.4f} (zero rates fixed), "
         f"one-day roll {bumped.theta_per_day:+.4f} (forwards realised)"
     )
+
+    # American put on a CRR tree: same model, another engine. The early-exercise premium
+    # is the value of being able to receive the strike before expiry.
+    tree = BinomialTreeEngine(model, steps=1000)
+    for style in (EuropeanOption, AmericanOption):
+        put = style("SPX", 6100.0, date(2026, 12, 18), OptionType.PUT)
+        on_tree = tree.price(put, snapshot)
+        name = style.__name__
+        print(f"{name:>14} put, 1000-step tree: {on_tree.npv:8.2f}  delta {on_tree.delta:+.4f}")
 
     # Implied volatility: invert a quoted price (no volatility surface needed).
     quote = 450.0

@@ -146,7 +146,8 @@ check that these values are the limit of the general formula as $\sigma \to 0$.
   approximates them well for an index, less well for a stock with one large dividend.
 - **No jumps, continuous hedging, no transaction costs.** The replication argument assumes
   all three. Gamma is the measure of how much the real-world hedging error costs.
-- **European exercise only.** American options need the CRR tree (next step of phase 2).
+- **European exercise only.** American options are priced on the
+  [CRR tree](american-options.md).
 
 ## Validation
 
