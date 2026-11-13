@@ -14,7 +14,7 @@ service built on top of it.
 > bonds (pricing, yield, durations, convexity, z-spread, curve DV01) and vanilla interest
 > rate swaps on separate forecast and discount curves. Phase 2 so far: European options
 > under Black-Scholes, analytic and bump-and-revalue Greeks, implied volatility, American
-> options on a CRR binomial tree. Every formula is validated against QuantLib.
+> options on a CRR binomial tree, Monte Carlo with variance reduction. Every formula is validated against QuantLib.
 
 **Documentation:** <https://djewiet.github.io/pricing-risk-engine/>, with a
 [reading guide](docs/reading-guide.md) (which files to read, in which order, and why), the
@@ -22,7 +22,7 @@ service built on top of it.
 ([curve](docs/finance/yield-curve.md), [bond](docs/finance/fixed-rate-bond.md),
 [analytics](docs/finance/bond-analytics.md), [swap](docs/finance/interest-rate-swap.md),
 [options](docs/finance/black-scholes.md), [option risk](docs/finance/option-risk.md),
-[American options](docs/finance/american-options.md)).
+[American options](docs/finance/american-options.md), [Monte Carlo](docs/finance/monte-carlo.md)).
 
 ## Quickstart
 
@@ -130,7 +130,7 @@ flowchart LR
 - **Explicit conventions.** Day counts, schedules, compounding and the curve time axis are
   always explicit; nothing is rolled or adjusted silently.
 - **Independent validation.** Closed forms, arbitrage properties (hypothesis) and a QuantLib
-  benchmark with identical conventions: 624 cases, discount factors to 1e-11, bond prices
+  benchmark with identical conventions: 648 cases, discount factors to 1e-11, bond prices
   to 1e-10, swap NPVs to 1e-8 of notional, option prices, Greeks and implied
   volatilities to 1e-10.
 
@@ -159,8 +159,8 @@ docs/           MkDocs site: reading guide, architecture, finance notes, ADRs
 ## Roadmap
 
 1. **Foundations**: curve, bonds, swaps (done); calendars, key-rate DV01.
-2. **Options**: Black-Scholes, Greeks, implied vol, CRR tree for American options (done);
-   Monte Carlo, validation report.
+2. **Options**: Black-Scholes, Greeks, implied vol, CRR tree for American options, Monte
+   Carlo (done); validation report.
 3. **Heston and performance**: NumPy → Numba → multi-process, benchmarked.
 4. **Risk service**: Redis Streams, worker pool, FastAPI + WebSocket, VaR, PostgreSQL.
 5. **Polish**: Prometheus/Grafana, published validation report.

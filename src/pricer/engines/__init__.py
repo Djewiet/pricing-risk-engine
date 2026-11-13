@@ -8,6 +8,11 @@ from pricer.engines.analytic_european import (
 from pricer.engines.base import PricingEngine
 from pricer.engines.binomial import BinomialTreeEngine, TreeValuation, binomial_tree
 from pricer.engines.bond import BondValuation, DiscountingBondEngine, discount_bond
+from pricer.engines.monte_carlo import (
+    MonteCarloEuropeanEngine,
+    MonteCarloValuation,
+    monte_carlo_european,
+)
 from pricer.engines.swap import DiscountingSwapEngine, SwapValuation, discount_swap
 
 __all__ = [
@@ -17,6 +22,8 @@ __all__ = [
     "BondValuation",
     "DiscountingBondEngine",
     "DiscountingSwapEngine",
+    "MonteCarloEuropeanEngine",
+    "MonteCarloValuation",
     "PricingEngine",
     "SwapValuation",
     "TreeValuation",
@@ -24,4 +31,5 @@ __all__ = [
     "black_scholes",
     "discount_bond",
     "discount_swap",
+    "monte_carlo_european",
 ]

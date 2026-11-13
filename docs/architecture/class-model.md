@@ -348,3 +348,39 @@ it at each node (`max(continuation, payoff)` when it is true) instead of testing
 of the instrument, so a Bermudan option (exercise on a list of dates) would add a term,
 not a branch. The analytic engine stays typed on `EuropeanOption`: mypy rejects pricing an
 American option in closed form.
+
+## Monte Carlo engine
+
+```mermaid
+classDiagram
+    direction LR
+    class MonteCarloEuropeanEngine {
+        <<frozen>>
+        +model BlackScholesModel
+        +paths int
+        +seed int
+        +antithetic bool
+        +control_variate bool
+        +price(option, market) MonteCarloValuation
+    }
+    class MonteCarloValuation {
+        <<frozen>>
+        +npv float
+        +std_error float
+        +paths int
+        +control_beta float
+        +confidence_interval(z) tuple
+    }
+    class BlackScholesModel
+    class EuropeanOption
+
+    MonteCarloEuropeanEngine o-- BlackScholesModel
+    MonteCarloEuropeanEngine ..> EuropeanOption : prices
+    MonteCarloEuropeanEngine ..> MonteCarloValuation : returns
+```
+
+The three option engines (`AnalyticEuropeanEngine`, `BinomialTreeEngine`,
+`MonteCarloEuropeanEngine`) share one model and differ only in the numerical method; each
+returns its own result type, because a Monte Carlo price comes with a standard error and a
+tree price with a number of steps. The Monte Carlo engine holds a *seed*: a frozen engine
+must give the same number every time it is called.

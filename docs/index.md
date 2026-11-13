@@ -10,7 +10,8 @@ independent implementation.
     US Treasury par yields, fixed-rate bonds (pricing, yield, durations, convexity,
     z-spread, curve DV01), vanilla interest rate swaps on separate forecast and discount
     curves. Phase 2 so far: European options under Black-Scholes, analytic and bump-and-revalue
-    Greeks, implied volatility, American options on a CRR binomial tree.
+    Greeks, implied volatility, American options on a CRR binomial tree, Monte Carlo with
+    antithetic and control variates.
     Everything is benchmarked against QuantLib. See the [roadmap](roadmap.md).
 
 ## What is in the box
@@ -20,9 +21,9 @@ independent implementation.
 | Market data | Day counts, schedules, discount curves, par-yield bootstrap, `MarketSnapshot` | [Rates](finance/rates.md), [Yield curve](finance/yield-curve.md) |
 | Instruments | `FixedRateBond`, `InterestRateSwap`, `EuropeanOption`, `AmericanOption` (contract terms, cash flows, payoffs) | [Fixed-rate bond](finance/fixed-rate-bond.md), [Swap](finance/interest-rate-swap.md), [Options](finance/black-scholes.md), [American](finance/american-options.md) |
 | Models | `BlackScholesModel`: which snapshot curves play $r$ and $q$ | [ADR 0002](adr/0002-option-model-binding.md) |
-| Engines | `DiscountingBondEngine`, `DiscountingSwapEngine` (two curves), `AnalyticEuropeanEngine` (Black-Scholes and Greeks), `BinomialTreeEngine` (CRR, European and American) | [Data flow](architecture/data-flow.md) |
+| Engines | `DiscountingBondEngine`, `DiscountingSwapEngine` (two curves), `AnalyticEuropeanEngine` (Black-Scholes and Greeks), `BinomialTreeEngine` (CRR, European and American), `MonteCarloEuropeanEngine` | [Data flow](architecture/data-flow.md) |
 | Analytics and risk | YTM, durations, convexity, z-spread, yield and curve DV01; option Greeks by bump, implied volatility | [Bond analytics](finance/bond-analytics.md), [Option risk](finance/option-risk.md) |
-| Validation | 624 QuantLib cases, closed forms, property-based tests | [Validation](validation.md) |
+| Validation | 648 validation cases (QuantLib and statistical), closed forms, property-based tests | [Validation](validation.md) |
 
 ## How this documentation is organised
 
