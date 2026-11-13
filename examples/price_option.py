@@ -2,7 +2,8 @@
 
 Discounting uses the bootstrapped Treasury curve (same quotes as ``price_bond.py``), the
 dividend yield is a flat curve, the volatility is flat. The analytic Greeks are printed in
-market units next to their raw values, then checked by bumping the snapshot.
+market units, compared with bump-and-revalue Greeks, and a quoted price is inverted into an
+implied volatility.
 
 Run it with ``uv run python examples/price_option.py``.
 """
@@ -11,8 +12,10 @@ from __future__ import annotations
 
 from datetime import UTC, date, datetime
 
+from pricer.analytics import implied_volatility
 from pricer.dates import Tenor
 from pricer.engines import AnalyticEuropeanEngine
+from pricer.greeks import bump_greeks
 from pricer.instruments import EuropeanOption, OptionType
 from pricer.market import (
     FlatForwardCurve,
@@ -54,7 +57,8 @@ def main() -> None:
         spots={"SPX": 6000.0},
         volatilities={"SPX": FlatVolatility(0.18)},
     )
-    engine = AnalyticEuropeanEngine(BlackScholesModel("USD-TSY", dividend_curve="SPX-DIV"))
+    model = BlackScholesModel("USD-TSY", dividend_curve="SPX-DIV")
+    engine = AnalyticEuropeanEngine(model)
 
     # One-year 6100 call and put on the index.
     for option_type in OptionType:
@@ -67,14 +71,28 @@ def main() -> None:
             f"theta/day {g.theta_per_day:+.3f}  rho/1bp {g.rho / 1e4:+.4f}"
         )
 
-    # The analytic delta is what the risk service will get by bumping the spot.
+    # Bump-and-revalue Greeks work with any engine: here they check the closed form.
     call = EuropeanOption("SPX", 6100.0, date(2026, 12, 18), OptionType.CALL)
-    up = engine.price(call, snapshot.with_spot("SPX", 6001.0)).npv
-    down = engine.price(call, snapshot.with_spot("SPX", 5999.0)).npv
-    print(
-        f"call delta: analytic {engine.price(call, snapshot).greeks.delta:.6f}, "
-        f"bumped {(up - down) / 2.0:.6f}"
+    analytic = engine.price(call, snapshot).greeks
+    bumped = bump_greeks(
+        lambda m: engine.price(call, m).npv,
+        snapshot,
+        "SPX",
+        "USD-TSY",
+        dividend_curve="SPX-DIV",
     )
+    for name in ("delta", "gamma", "vega", "rho"):
+        exact, bump = getattr(analytic, name), getattr(bumped, name)
+        print(f"call {name:>5}: analytic {exact:.6f}, bumped {bump:.6f}")
+    print(
+        f"call theta/day: analytic {analytic.theta_per_day:+.4f} (zero rates fixed), "
+        f"one-day roll {bumped.theta_per_day:+.4f} (forwards realised)"
+    )
+
+    # Implied volatility: invert a quoted price (no volatility surface needed).
+    quote = 450.0
+    sigma = implied_volatility(call, quote, model, snapshot)
+    print(f"call quoted {quote:.2f} -> implied volatility {sigma:.4%}")
 
 
 if __name__ == "__main__":

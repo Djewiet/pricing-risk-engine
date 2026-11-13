@@ -103,7 +103,8 @@ basis point ($\text{rho}/10^4$) and theta per day (`theta_per_day` $= \theta/365
 **Theta convention.** Theta is the change in value as calendar time passes, holding the
 spot, the volatility and the zero rates $r$, $q$ *to expiry* fixed. With a sloped curve,
 another convention (holding the forward curve fixed, so the zero rate to expiry rolls down
-the curve) gives a slightly different number; ours is QuantLib's.
+the curve) gives a slightly different number; ours is QuantLib's. The bump-and-revalue theta
+uses the other one, see [Greeks by bump](option-risk.md#bump-and-revalue-greeks).
 
 **Rho and the curve.** Rho is the sensitivity to the zero rate to expiry, which is exactly
 what a parallel shift of the discount curve moves. The unit tests check that rho equals the

@@ -221,6 +221,51 @@ class ZeroSpreadedCurve(YieldCurve):
 
 
 @dataclass(frozen=True, slots=True, eq=False)
+class RolledCurve(YieldCurve):
+    """Base curve seen from a later reference date, with its forward rates unchanged.
+
+    ``P'(t) = P(delta + t) / P(delta)`` where ``delta`` is the base-curve time of the new
+    reference date: tomorrow's curve is today's forward curve. This is the "forwards are
+    realised" roll used for bump-and-revalue theta; the alternative, keeping each zero rate
+    to a fixed maturity unchanged, is what the analytic Black-Scholes theta assumes. The
+    two coincide on a flat curve.
+
+    Attributes:
+        base: Curve to roll.
+        reference: New reference date, on or after the base reference date.
+    """
+
+    base: YieldCurve
+    reference: date
+
+    def __post_init__(self) -> None:
+        if self.reference < self.base.reference_date:
+            msg = (
+                f"Cannot roll a curve anchored on {self.base.reference_date} "
+                f"back to {self.reference}"
+            )
+            raise MarketDataError(msg)
+
+    @property
+    def reference_date(self) -> date:  # noqa: D102
+        return self.reference
+
+    @property
+    def day_count(self) -> DayCount:  # noqa: D102
+        return self.base.day_count
+
+    @property
+    def shift(self) -> float:
+        """``delta``: base-curve time of the new reference date."""
+        return self.base.time(self.reference)
+
+    def discount_factors(self, times: FloatArray) -> FloatArray:  # noqa: D102
+        _check_non_negative(times)
+        delta = self.shift
+        return self.base.discount_factors(times + delta) / self.base.discount_factor(delta)
+
+
+@dataclass(frozen=True, slots=True, eq=False)
 class DiscountCurve(YieldCurve):
     """Discount curve interpolated log-linearly between pillar discount factors.
 

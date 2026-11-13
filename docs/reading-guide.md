@@ -106,6 +106,9 @@ first place where the third leg of Instrument / Model / Engine appears.
 | [`engines/analytic_european.py`][engine-bs] | The closed form and its Greeks. | Black formula on the forward; `norm_cdf` through `erfc` (tail precision); the `stdev == 0` branch (expiry today, zero vol). |
 | [`tests/engines/test_analytic_european.py`][test-bs] | How a formula is proven without QuantLib. | Parity, bounds, strike convexity and the Black-Scholes PDE under hypothesis; Greeks against snapshot bumps. |
 | [`validation/test_european_option_quantlib.py`][val-bs] | The benchmark. | 162 cases incl. a bootstrapped curve between pillars; price and six Greeks to 1e-10. |
+| [`greeks/bump.py`][bump] | Greeks for any engine. | Takes a `MarketSnapshot -> float` like `parallel_dv01`; the bump size trade-off (module docstring); theta by rolling the whole market. Background: [Greeks by bump and implied volatility](finance/option-risk.md). |
+| [`market/curves.py`][curves] (`RolledCurve`), [`market/volatility.py`][volatility] (`ShiftedVolatility`) | The market scenarios behind theta and vega. | Two decorators, like `ZeroSpreadedCurve`: they wrap, they do not copy. `RolledCurve` keeps forwards. |
+| [`analytics/option.py`][iv] | Implied volatility. | Bounds check before solving (existence and uniqueness), bracket doubling, why Brent rather than Newton. |
 
 ### Step 5: analytics and risk (45 min)
 
@@ -129,7 +132,7 @@ Finance background: [Bond analytics and risk](finance/bond-analytics.md).
 | Coming with | New files | Reading position |
 |---|---|---|
 | Business calendars, key-rate DV01 (phase 1) | `dates/calendar.py`, `risk/` | Step 1 and step 5. |
-| Options, rest of phase 2 | `greeks/` (bump Greeks), `engines/` (tree, Monte Carlo), `validation/report` | Step 4c. |
+| Options, rest of phase 2 | `engines/` (tree, Monte Carlo), `validation/report` | Step 4c. |
 | Risk service (phase 4) | `src/service/` | Separate route, to be written. |
 
 [readme]: https://github.com/Djewiet/pricing-risk-engine/blob/main/README.md
@@ -144,6 +147,8 @@ Finance background: [Bond analytics and risk](finance/bond-analytics.md).
 [engine-bs]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/engines/analytic_european.py
 [test-bs]: https://github.com/Djewiet/pricing-risk-engine/blob/main/tests/engines/test_analytic_european.py
 [val-bs]: https://github.com/Djewiet/pricing-risk-engine/blob/main/validation/test_european_option_quantlib.py
+[bump]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/greeks/bump.py
+[iv]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/analytics/option.py
 [errors]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/errors.py
 [tenor]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/dates/tenor.py
 [schedule]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/dates/schedule.py

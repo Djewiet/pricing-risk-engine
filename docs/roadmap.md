@@ -3,7 +3,7 @@
 | Phase | Scope | Status |
 |---|---|---|
 | 1. Foundations | Repo, CI, dates, market data, yield curve bootstrap, bonds, swaps | Core done; calendars and key-rate DV01 remaining |
-| 2. Options | Black-Scholes analytic, CRR tree (American), Monte Carlo (antithetic, control variates), Greeks, validation report | In progress: Black-Scholes and analytic Greeks done |
+| 2. Options | Black-Scholes analytic, CRR tree (American), Monte Carlo (antithetic, control variates), Greeks, validation report | In progress: Black-Scholes, analytic and bump Greeks, implied volatility done |
 | 3. Heston and performance | Heston Monte Carlo; naive Python → NumPy → Numba kernels; multi-process portfolio repricing; pytest-benchmark tables | Planned |
 | 4. Risk service | Simulated tick feed, Redis Streams consumer groups, worker pool, FastAPI + WebSocket, historical VaR, PostgreSQL | Planned |
 | 5. Polish | Prometheus/Grafana, validation report, README GIF, published docs | Planned |
@@ -22,8 +22,8 @@
 | Step | Content | Status |
 |---|---|---|
 | 1 | `EuropeanOption`, `BlackScholesModel`, `AnalyticEuropeanEngine`, analytic Greeks, QuantLib benchmark | Done |
-| 2 | Generic bump-and-revalue Greeks on any engine; implied volatility solver | Next |
-| 3 | `AmericanOption`, CRR binomial tree (European and American), early-exercise properties | Planned |
+| 2 | Generic bump-and-revalue Greeks on any engine; implied volatility solver | Done |
+| 3 | `AmericanOption`, CRR binomial tree (European and American), early-exercise properties | Next |
 | 4 | Monte Carlo engine: vectorised GBM, seeded `Generator`, antithetic and control variates, standard errors | Planned |
 | 5 | Convergence studies (tree and Monte Carlo to the closed form) and the generated Model Validation Report | Planned |
 
