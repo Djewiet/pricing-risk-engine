@@ -48,6 +48,9 @@ hypothesis (property-based testing).
 - Binomial tree: European put-call parity exact at any number of steps, American ≥
   max(European, payoff), American call without dividends = European call (Merton),
   American put with negative rates = European put, American value increasing in maturity.
+- Monte Carlo: estimates within 4 standard errors of the closed form, standard error in
+  $1/\sqrt{n}$, each variance-reduction technique lowers the variance, put-call parity exact
+  with the control variate, Greeks by bump with common random numbers.
 - Implied volatility: price → vol → price round trip, call and put imply the same vol,
   prices outside the no-arbitrage bounds are rejected.
 
@@ -68,6 +71,7 @@ not a modelling choice.
 | Implied volatility | 90 cases: 5 strikes × 3 expiries × 3 vols (5%–120%) × call/put | Volatility | $10^{-10}$ + $10^{-14} V/\text{vega}$ | A price known to $\varepsilon$ fixes $\sigma$ to $\varepsilon/\text{vega}$; observed $\le 3.1 \times 10^{-12}$; 8 cases with time value at noise level check repricing |
 | CRR tree (American and European) | 3 spots × 3 expiries × 2 rates × 2 dividend yields × 2 vols × call/put, both styles: 288 cases at N = 1000 | Price, delta, gamma, theta | $3 \times 10^{-3}$, $10^{-4}$, $2 \times 10^{-3}$ rel., $5 \times 10^{-3}$ | QuantLib's CRR uses a first-order expansion of our up probability: the trees differ by O(1/N); observed price gap $\le 1.6 \times 10^{-3}$. Theta differs by definition where the option is exercised today (see the American options page) |
 | American option vs PDE | 24 cases, tree N = 2000 vs `FdBlackScholesVanillaEngine` 800 × 800 | Price | $5 \times 10^{-3}$ | Independent numerical method, both errors ~$10^{-3}$ |
+| Monte Carlo (statistical) | 3 strikes × call/put × antithetic on/off × control variate on/off; 400 seeds × 2,000 paths each | Coverage of the 95% interval; mean and variance of $z = (\hat V - V)/\text{s.e.}$ | coverage in [91.7%, 98.3%], mean $\pm 0.2$, variance [0.75, 1.3] | $\pm 3\sigma$ sampling bands for 400 seeds; observed coverage 93.3%–95.5% |
 | European option (Black-Scholes) | 144 flat markets (3 spots × 3 expiries × 2 rates incl. negative × 2 dividend yields × 2 vols × call/put) + 18 on a bootstrapped curve | Price, delta, gamma, vega, theta, rho, dividend rho | $10^{-10}$ relative, $10^{-12}$ absolute | Same closed form on both sides; observed $\le 1.1 \times 10^{-13}$ |
 
 The reference dates are chosen to break date generation: 29 and 31 August, 29 February,

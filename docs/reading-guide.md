@@ -109,6 +109,8 @@ first place where the third leg of Instrument / Model / Engine appears.
 | [`greeks/bump.py`][bump] | Greeks for any engine. | Takes a `MarketSnapshot -> float` like `parallel_dv01`; the bump size trade-off (module docstring); theta by rolling the whole market. Background: [Greeks by bump and implied volatility](finance/option-risk.md). |
 | [`market/curves.py`][curves] (`RolledCurve`), [`market/volatility.py`][volatility] (`ShiftedVolatility`) | The market scenarios behind theta and vega. | Two decorators, like `ZeroSpreadedCurve`: they wrap, they do not copy. `RolledCurve` keeps forwards. |
 | [`engines/binomial.py`][tree] | A second engine for the same model, and the first for American options. Background: [American options and the binomial tree](finance/american-options.md). | `VanillaOption.early_exercise` read at each node instead of an `isinstance`; one vectorised operation per time step; Greeks from the first two steps; the `p` validity check. |
+| [`engines/monte_carlo.py`][mc] | The third engine for the same model. Background: [Monte Carlo pricing](finance/monte-carlo.md). | Exact simulation of $S_T$; antithetic pairs and why the standard error uses pair averages; the control-variate regression; the engine holds a seed, not a generator (purity, common random numbers). |
+| [`validation/test_monte_carlo_statistics.py`][val-mc] | How a random number is validated. | Coverage of the 95% interval over 400 seeds, mean and variance of the standardised errors. |
 | [`analytics/option.py`][iv] | Implied volatility. | Bounds check before solving (existence and uniqueness), bracket doubling, why Brent rather than Newton. |
 
 ### Step 5: analytics and risk (45 min)
@@ -133,7 +135,7 @@ Finance background: [Bond analytics and risk](finance/bond-analytics.md).
 | Coming with | New files | Reading position |
 |---|---|---|
 | Business calendars, key-rate DV01 (phase 1) | `dates/calendar.py`, `risk/` | Step 1 and step 5. |
-| Options, rest of phase 2 | `engines/` (Monte Carlo), `validation/report` | Step 4c. |
+| Options, rest of phase 2 | `validation/report` (convergence studies, generated report) | Step 6. |
 | Risk service (phase 4) | `src/service/` | Separate route, to be written. |
 
 [readme]: https://github.com/Djewiet/pricing-risk-engine/blob/main/README.md
@@ -151,6 +153,8 @@ Finance background: [Bond analytics and risk](finance/bond-analytics.md).
 [bump]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/greeks/bump.py
 [iv]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/analytics/option.py
 [tree]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/engines/binomial.py
+[mc]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/engines/monte_carlo.py
+[val-mc]: https://github.com/Djewiet/pricing-risk-engine/blob/main/validation/test_monte_carlo_statistics.py
 [errors]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/errors.py
 [tenor]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/dates/tenor.py
 [schedule]: https://github.com/Djewiet/pricing-risk-engine/blob/main/src/pricer/dates/schedule.py

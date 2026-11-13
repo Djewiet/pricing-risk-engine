@@ -3,7 +3,8 @@
 Discounting uses the bootstrapped Treasury curve (same quotes as ``price_bond.py``), the
 dividend yield is a flat curve, the volatility is flat. The analytic Greeks are printed in
 market units and compared with bump-and-revalue Greeks; an American put is priced on a
-binomial tree; a quoted price is inverted into an implied volatility.
+binomial tree, the call by Monte Carlo; a quoted price is inverted into an implied
+volatility.
 
 Run it with ``uv run python examples/price_option.py``.
 """
@@ -14,7 +15,7 @@ from datetime import UTC, date, datetime
 
 from pricer.analytics import implied_volatility
 from pricer.dates import Tenor
-from pricer.engines import AnalyticEuropeanEngine, BinomialTreeEngine
+from pricer.engines import AnalyticEuropeanEngine, BinomialTreeEngine, MonteCarloEuropeanEngine
 from pricer.greeks import bump_greeks
 from pricer.instruments import AmericanOption, EuropeanOption, OptionType
 from pricer.market import (
@@ -97,6 +98,15 @@ def main() -> None:
         on_tree = tree.price(put, snapshot)
         name = style.__name__
         print(f"{name:>14} put, 1000-step tree: {on_tree.npv:8.2f}  delta {on_tree.delta:+.4f}")
+
+    # Monte Carlo on the same model: an estimate with its standard error.
+    monte_carlo = MonteCarloEuropeanEngine(model, paths=200_000, seed=2026)
+    estimate = monte_carlo.price(call, snapshot)
+    low, high = estimate.confidence_interval()
+    print(
+        f"call by Monte Carlo: {estimate.npv:.2f} +/- {estimate.std_error:.2f} "
+        f"(95% CI {low:.2f} to {high:.2f}; closed form {engine.price(call, snapshot).npv:.2f})"
+    )
 
     # Implied volatility: invert a quoted price (no volatility surface needed).
     quote = 450.0

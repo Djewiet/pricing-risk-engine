@@ -64,7 +64,7 @@ flowchart TB
         models["models<br/>black_scholes"]
     end
     subgraph L3["Computation"]
-        eng["engines<br/>base, bond, swap, analytic_european, binomial"]
+        eng["engines<br/>base, bond, swap, analytic_european, binomial, monte_carlo"]
     end
     subgraph L4["Measures"]
         risk["risk.curve"]

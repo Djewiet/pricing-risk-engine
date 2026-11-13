@@ -70,6 +70,7 @@ nav:
       - European options (Black-Scholes): finance/black-scholes.md
       - Greeks by bump and implied volatility: finance/option-risk.md
       - American options and the binomial tree: finance/american-options.md
+      - Monte Carlo pricing: finance/monte-carlo.md
   - Validation: validation.md
   - Development: development.md
   - Decisions:

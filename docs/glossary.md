@@ -19,6 +19,9 @@ Binomial tree (CRR)
 :   Discrete model in which the spot moves up or down by fixed factors at each step; values
     are computed backwards from expiry. Prices American options.
 
+Antithetic variates
+:   Pairing each random draw $Z$ with $-Z$ to reduce Monte Carlo variance.
+
 Black-Scholes
 :   Model in which the underlying follows a geometric Brownian motion with constant
     volatility; gives closed-form prices for European options.
@@ -30,6 +33,14 @@ Bump and revalue
 Call / put
 :   Right to buy / sell the underlying at the strike. European: exercisable at expiry only;
     American: at any time up to expiry.
+
+Common random numbers
+:   Reusing the same random draws for a base and a bumped Monte Carlo valuation, so the
+    noise cancels in the difference.
+
+Control variate
+:   A quantity with a known mean, correlated with the payoff, used to cancel part of the
+    Monte Carlo error.
 
 Convexity
 :   $P''(y)/P$: curvature of the price-yield relation.
@@ -93,6 +104,9 @@ SOFR
 
 Stub
 :   Irregular (shorter or longer) coupon period, at the start of a backward schedule.
+
+Standard error
+:   Standard deviation of a Monte Carlo estimate: $\text{stdev}(\text{payoff})/\sqrt{n}$.
 
 Strike
 :   Price at which an option lets its holder buy (call) or sell (put) the underlying.
