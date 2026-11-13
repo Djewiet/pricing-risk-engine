@@ -23,7 +23,7 @@ independent implementation.
 | Models | `BlackScholesModel`: which snapshot curves play $r$ and $q$ | [ADR 0002](adr/0002-option-model-binding.md) |
 | Engines | `DiscountingBondEngine`, `DiscountingSwapEngine` (two curves), `AnalyticEuropeanEngine` (Black-Scholes and Greeks), `BinomialTreeEngine` (CRR, European and American), `MonteCarloEuropeanEngine` | [Data flow](architecture/data-flow.md) |
 | Analytics and risk | YTM, durations, convexity, z-spread, yield and curve DV01; option Greeks by bump, implied volatility | [Bond analytics](finance/bond-analytics.md), [Option risk](finance/option-risk.md) |
-| Validation | 648 validation cases (QuantLib and statistical), closed forms, property-based tests | [Validation](validation.md) |
+| Validation | 655 validation cases (QuantLib, statistical, convergence orders), closed forms, property-based tests, generated report | [Validation](validation.md), [Model Validation Report](validation-report/index.md) |
 
 ## How this documentation is organised
 

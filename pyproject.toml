@@ -20,6 +20,7 @@ dev = [
     "scipy-stubs>=1.14",
 ]
 validation = [
+    "matplotlib>=3.11.2",
     "QuantLib>=1.36",
 ]
 docs = [

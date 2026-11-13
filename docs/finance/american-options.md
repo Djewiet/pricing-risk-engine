@@ -99,7 +99,8 @@ strike falls at a different place between terminal nodes depending on the parity
 gives a clean $1/N$ decay; the tests check that quadrupling $N$ divides the error by more
 than 2. Improvements (out of scope for now): smoothing the last step with the Black-Scholes
 formula, Richardson extrapolation over $N$ and $2N$, or the Leisen-Reimer tree (order 2).
-The convergence study and plots are part of the validation report (phase 2, step 5).
+The convergence study and its plots are in the
+[Model Validation Report](../validation-report/index.md#convergence-of-the-binomial-tree).
 
 ## Validation
 

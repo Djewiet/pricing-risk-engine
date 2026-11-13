@@ -42,8 +42,17 @@ Control variate
 :   A quantity with a known mean, correlated with the payoff, used to cancel part of the
     Monte Carlo error.
 
+Convergence order
+:   Rate at which a numerical error vanishes: error $\approx C n^{p}$, so $p$ is the slope
+    of the error against $n$ on a log-log plot. CRR tree: $p = -1$ in the steps; Monte
+    Carlo: $p = -1/2$ in the paths.
+
 Convexity
 :   $P''(y)/P$: curvature of the price-yield relation.
+
+Coverage (of a confidence interval)
+:   Fraction of independent runs whose interval contains the true value. A correct 95%
+    interval covers 95% of the time; less means the standard error is underestimated.
 
 Day count
 :   Convention turning a date interval into a year fraction (ACT/360, ACT/ACT ICMA...).

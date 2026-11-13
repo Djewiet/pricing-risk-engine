@@ -128,6 +128,7 @@ Finance background: [Bond analytics and risk](finance/bond-analytics.md).
 |---|---|---|
 | [`validation/test_yield_curve_quantlib.py`][val-curve] | The curve benchmark. | The QuantLib setup reproducing our conventions exactly (module docstring), the 5 shapes × 6 dates grid, the tolerance and its justification. |
 | [`validation/test_bond_quantlib.py`][val-bond] | The bond benchmark. | Both libraries discount on the *same* curve, so the comparison isolates the bond code. |
+| [`validation/report/`][report] | The generated Model Validation Report. | `benchmarks.py` reuses the test grids; `convergence.py` measures the order as a log-log slope; read the [report](validation-report/index.md) itself first. |
 | [`pyproject.toml`][pyproject], [`.github/workflows/ci.yml`][ci] | The quality gates. | ruff rule set, `mypy --strict`, coverage gate, the separate validation job. |
 
 ## Where things will go
@@ -135,7 +136,6 @@ Finance background: [Bond analytics and risk](finance/bond-analytics.md).
 | Coming with | New files | Reading position |
 |---|---|---|
 | Business calendars, key-rate DV01 (phase 1) | `dates/calendar.py`, `risk/` | Step 1 and step 5. |
-| Options, rest of phase 2 | `validation/report` (convergence studies, generated report) | Step 6. |
 | Risk service (phase 4) | `src/service/` | Separate route, to be written. |
 
 [readme]: https://github.com/Djewiet/pricing-risk-engine/blob/main/README.md
@@ -174,3 +174,4 @@ Finance background: [Bond analytics and risk](finance/bond-analytics.md).
 [val-bond]: https://github.com/Djewiet/pricing-risk-engine/blob/main/validation/test_bond_quantlib.py
 [pyproject]: https://github.com/Djewiet/pricing-risk-engine/blob/main/pyproject.toml
 [ci]: https://github.com/Djewiet/pricing-risk-engine/blob/main/.github/workflows/ci.yml
+[report]: https://github.com/Djewiet/pricing-risk-engine/tree/main/validation/report

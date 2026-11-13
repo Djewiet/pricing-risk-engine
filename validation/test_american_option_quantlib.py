@@ -23,7 +23,7 @@ from pricer.engines import BinomialTreeEngine
 from pricer.instruments import AmericanOption, EuropeanOption, OptionType, VanillaOption
 from pricer.market import FlatForwardCurve, FlatVolatility, MarketSnapshot
 from pricer.models import BlackScholesModel
-from validation.test_european_option_quantlib import VALUATION, ql_curve, to_ql
+from validation.quantlib_setup import VALUATION, bsm_process, ql_vanilla
 
 ql = pytest.importorskip("QuantLib")
 
@@ -63,22 +63,10 @@ def market(spot: float, rate: float, dividend: float, vol: float) -> MarketSnaps
 def quantlib_option(
     option: VanillaOption, spot: float, rate: float, dividend: float, vol: float
 ) -> tuple[Any, Any]:
-    ql.Settings.instance().evaluationDate = to_ql(VALUATION)
-    process = ql.BlackScholesMertonProcess(
-        ql.QuoteHandle(ql.SimpleQuote(spot)),
-        ql.YieldTermStructureHandle(ql_curve(FlatForwardCurve(VALUATION, dividend))),
-        ql.YieldTermStructureHandle(ql_curve(FlatForwardCurve(VALUATION, rate))),
-        ql.BlackVolTermStructureHandle(
-            ql.BlackConstantVol(to_ql(VALUATION), ql.NullCalendar(), vol, ql.Actual365Fixed())
-        ),
+    process = bsm_process(
+        spot, FlatForwardCurve(VALUATION, rate), FlatForwardCurve(VALUATION, dividend), vol
     )
-    exercise = (
-        ql.AmericanExercise(to_ql(VALUATION), to_ql(option.expiry))
-        if option.early_exercise
-        else ql.EuropeanExercise(to_ql(option.expiry))
-    )
-    ql_type = ql.Option.Call if option.option_type is OptionType.CALL else ql.Option.Put
-    return ql.VanillaOption(ql.PlainVanillaPayoff(ql_type, option.strike), exercise), process
+    return ql_vanilla(option), process
 
 
 CASES = list(itertools.product(SPOTS, EXPIRIES, RATES, DIVIDENDS, VOLS, TYPES))
